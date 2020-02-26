@@ -1,9 +1,10 @@
 package com.github.aytchell.feedbackstates;
 
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public interface StateMachineCompiler {
-    List<Integer> getRequiredDevices();
+    Set<Integer> getRequiredDevices();
+
     StateMachine compileStateMachine(Map<Integer, DeviceCommandCompiler> commandCompilers);
 }
