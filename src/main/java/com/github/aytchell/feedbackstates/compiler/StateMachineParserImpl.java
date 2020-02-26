@@ -25,7 +25,7 @@ public class StateMachineParserImpl implements StateMachineParser {
         }
 
         final StateMachinePojo stateMachinePojo = parseJsonToPojo(jsonDescription);
-        validateParsedStateMachine(stateMachinePojo);
+        StateMachinePojoValidator.validate(stateMachinePojo);
         final Set<Integer> devices = extractRequiredDeviceIds(stateMachinePojo);
 
         return new StateMachineCompilerImpl(devices, stateMachinePojo);
@@ -37,12 +37,6 @@ public class StateMachineParserImpl implements StateMachineParser {
             });
         } catch (JsonProcessingException e) {
             throw new MalformedInputException("Error while parsing given json");
-        }
-    }
-
-    private void validateParsedStateMachine(StateMachinePojo stateMachinePojo) throws MalformedInputException {
-        if (stateMachinePojo.getStates() == null || stateMachinePojo.getStates().isEmpty()) {
-            throw new MalformedInputException("StateMachine contains no states");
         }
     }
 

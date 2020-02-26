@@ -1,0 +1,14 @@
+{
+  "options" : {
+    "initialState" : "Start"
+  },
+  "triggers" : [
+      {
+          "name" : "move",
+          "eventSourceId" : 1,
+          "eventPayload" : "move ya"
+      }
+  ],
+  "states" : [
+  ]
+}
