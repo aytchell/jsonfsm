@@ -1,0 +1,14 @@
+{
+  "options" : {
+    "initialState" : "Start"
+  },
+  "states" : [
+    {
+      "name" : "Start",
+      "onEntry" : {
+        "deviceId" : 10,
+        "commandString" : "Hello, world!"
+      }
+    }
+  ]
+}
