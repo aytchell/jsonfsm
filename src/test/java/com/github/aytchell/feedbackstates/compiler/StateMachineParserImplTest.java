@@ -5,6 +5,7 @@ import com.github.aytchell.feedbackstates.DeviceCommandCompiler;
 import com.github.aytchell.feedbackstates.StateMachineCompiler;
 import com.github.aytchell.feedbackstates.StateMachine;
 import com.github.aytchell.feedbackstates.StateMachineParser;
+import com.github.aytchell.feedbackstates.exceptions.CompilationException;
 import com.github.aytchell.feedbackstates.exceptions.MalformedInputException;
 import org.junit.jupiter.api.Test;
 
@@ -28,7 +29,7 @@ class StateMachineParserImplTest {
     }
 
     @Test
-    void commandOnExitAndEnter() throws IOException, MalformedInputException {
+    void commandOnExitAndEnter() throws IOException, MalformedInputException, CompilationException {
         final String json = readResourceTextFile("simple_exit_enter.json");
         final StateMachineParser parser = new StateMachineParserImpl();
         final StateMachineCompiler compiler = parser.parseAndListRequiredDeviceIds(json);
@@ -47,7 +48,7 @@ class StateMachineParserImplTest {
     }
 
     @Test
-    void multipleDevicesAndCommands() throws IOException, MalformedInputException {
+    void multipleDevicesAndCommands() throws IOException, MalformedInputException, CompilationException {
         final String json = readResourceTextFile("multiple_devices_and_cmds.json");
         final StateMachineParser parser = new StateMachineParserImpl();
         final StateMachineCompiler compiler = parser.parseAndListRequiredDeviceIds(json);
@@ -67,6 +68,20 @@ class StateMachineParserImplTest {
         final StateMachine stateMachine = compiler.compileStateMachine(compilers);
         stateMachine.inject(1, "move ya");
         assertEquals("1:Cmd1 2:Cmd2 3:Cmd3 4:Cmd4 ", buffer.toString());
+    }
+
+    @Test
+    void notEnoughDeviceCompilersGivenThrows() throws IOException, MalformedInputException {
+        final String json = readResourceTextFile("multiple_devices_and_cmds.json");
+        final StateMachineParser parser = new StateMachineParserImpl();
+        final StateMachineCompiler compiler = parser.parseAndListRequiredDeviceIds(json);
+
+        final Map<Integer, DeviceCommandCompiler> compilers = new HashMap<>();
+        compilers.put(1, new LogDeviceCommandCompiler("", new StringBuffer()));
+        final Exception e = assertThrows(CompilationException.class, () -> compiler.compileStateMachine(compilers));
+        final String message = e.getMessage();
+        assertTrue(message.contains("compiler for commands of device"), "Failed message: " + message);
+        assertTrue(message.contains("missing"), "Failed message: " + message);
     }
 
     private String readResourceTextFile(String filename) throws IOException {

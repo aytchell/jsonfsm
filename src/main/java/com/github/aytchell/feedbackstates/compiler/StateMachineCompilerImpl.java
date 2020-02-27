@@ -4,6 +4,7 @@ import com.github.aytchell.feedbackstates.DeviceCommand;
 import com.github.aytchell.feedbackstates.DeviceCommandCompiler;
 import com.github.aytchell.feedbackstates.StateMachine;
 import com.github.aytchell.feedbackstates.StateMachineCompiler;
+import com.github.aytchell.feedbackstates.exceptions.CompilationException;
 import com.github.aytchell.feedbackstates.input.pojos.CommandPojo;
 import com.github.aytchell.feedbackstates.input.pojos.StateMachinePojo;
 import com.github.aytchell.feedbackstates.input.pojos.StatePojo;
@@ -31,7 +32,9 @@ public class StateMachineCompilerImpl implements StateMachineCompiler {
     }
 
     @Override
-    public StateMachine compileStateMachine(Map<Integer, DeviceCommandCompiler> commandCompilers) {
+    public StateMachine compileStateMachine(Map<Integer, DeviceCommandCompiler> commandCompilers)
+            throws CompilationException {
+        checkGivenCompilers(commandCompilers);
         final String initialState = findInitialState(stateMachinePojo);
         buildTriggers();
         buildStates(commandCompilers);
@@ -40,6 +43,14 @@ public class StateMachineCompilerImpl implements StateMachineCompiler {
                 new com.github.oxo42.stateless4j.StateMachine<>(initialState, config);
 
         return new StateMachineImpl(stateMachine, mapping);
+    }
+
+    private void checkGivenCompilers(Map<Integer, DeviceCommandCompiler> commandCompilers) throws CompilationException {
+        for (Integer id : requiredDevices) {
+            if (!commandCompilers.containsKey(id)) {
+                throw new CompilationException("compiler for commands of device " + id + " is missing");
+            }
+        }
     }
 
     private String findInitialState(StateMachinePojo stateMachinePojo) {
