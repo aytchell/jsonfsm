@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -27,7 +28,7 @@ class StateMachineParserImplTest {
     }
 
     @Test
-    void commandOnEnteringStartState() throws IOException, MalformedInputException {
+    void commandOnExitAndEnter() throws IOException, MalformedInputException {
         final String json = readResourceTextFile("simple_exit_enter.json");
         final StateMachineParser parser = new StateMachineParserImpl();
         final StateMachineCompiler compiler = parser.parseAndListRequiredDeviceIds(json);
@@ -40,9 +41,32 @@ class StateMachineParserImplTest {
 
         StringBuffer buffer = new StringBuffer();
         final StateMachine stateMachine = compiler.compileStateMachine(
-                Map.of(10, new LogDeviceCommandCompiler(buffer)));
+                Map.of(10, new LogDeviceCommandCompiler("", buffer)));
         stateMachine.inject(1, "move ya");
         assertEquals("Exiting 'Start' ...Entering 'Stop' ...", buffer.toString());
+    }
+
+    @Test
+    void multipleDevicesAndCommands() throws IOException, MalformedInputException {
+        final String json = readResourceTextFile("multiple_devices_and_cmds.json");
+        final StateMachineParser parser = new StateMachineParserImpl();
+        final StateMachineCompiler compiler = parser.parseAndListRequiredDeviceIds(json);
+        assertNotNull(compiler);
+        assertNotNull(compiler.getRequiredDevices());
+
+        final Set<Integer> devices = compiler.getRequiredDevices();
+        assertEquals(Set.of(1,2,3,4), devices);
+
+        StringBuffer buffer = new StringBuffer();
+
+        final Map<Integer, DeviceCommandCompiler> compilers = new HashMap<>();
+        compilers.put(1, new LogDeviceCommandCompiler("1:", buffer));
+        compilers.put(2, new LogDeviceCommandCompiler("2:", buffer));
+        compilers.put(3, new LogDeviceCommandCompiler("3:", buffer));
+        compilers.put(4, new LogDeviceCommandCompiler("4:", buffer));
+        final StateMachine stateMachine = compiler.compileStateMachine(compilers);
+        stateMachine.inject(1, "move ya");
+        assertEquals("1:Cmd1 2:Cmd2 3:Cmd3 4:Cmd4 ", buffer.toString());
     }
 
     private String readResourceTextFile(String filename) throws IOException {
@@ -55,30 +79,35 @@ class StateMachineParserImplTest {
     }
 
     private static class LogDeviceCommand implements DeviceCommand {
-        private StringBuffer sb;
+        private final String prefix;
+        private final StringBuffer sb;
         private final String text;
 
-        LogDeviceCommand(StringBuffer buffer, String text) {
+        LogDeviceCommand(String customPrefix, StringBuffer buffer, String text) {
+            prefix = customPrefix;
             this.sb = buffer;
             this.text = text;
         }
 
         @Override
         public void execute() {
+            sb.append(prefix);
             sb.append(text);
         }
     }
 
     private static class LogDeviceCommandCompiler implements DeviceCommandCompiler {
-        private StringBuffer sb;
+        private final String customPrefix;
+        private final StringBuffer sb;
 
-        public LogDeviceCommandCompiler(StringBuffer buffer) {
-            sb = buffer;
+        public LogDeviceCommandCompiler(String customPrefix, StringBuffer buffer) {
+            this.customPrefix = customPrefix;
+            this.sb = buffer;
         }
 
         @Override
         public DeviceCommand compile(String commandString) {
-            return new LogDeviceCommand(sb, commandString);
+            return new LogDeviceCommand(customPrefix, sb, commandString);
         }
     }
 }

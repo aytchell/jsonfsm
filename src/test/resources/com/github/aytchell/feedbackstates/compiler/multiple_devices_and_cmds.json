@@ -1,0 +1,38 @@
+{
+  "options" : {
+    "initialState" : "Start"
+  },
+  "triggers" : [
+      {
+          "name" : "move",
+          "eventSourceId" : 1,
+          "eventPayload" : "move ya"
+      }
+  ],
+  "states" : [
+    {
+      "name" : "Start",
+      "onExit" : [{
+        "deviceId" : 1,
+        "commandString" : "Cmd1 "
+      }, {
+        "deviceId" : 2,
+        "commandString" : "Cmd2 "
+      }],
+      "transitions" : [{
+          "triggerName" : "move",
+          "targetState" : "Stop"
+      }]
+    },
+    {
+      "name" : "Stop",
+      "onEntry" : [{
+        "deviceId" : 3,
+        "commandString" : "Cmd3 "
+      }, {
+        "deviceId" : 4,
+        "commandString" : "Cmd4 "
+      }]
+    }
+  ]
+}
