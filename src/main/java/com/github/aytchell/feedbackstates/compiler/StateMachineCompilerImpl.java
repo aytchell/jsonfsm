@@ -63,8 +63,17 @@ public class StateMachineCompilerImpl implements StateMachineCompiler {
         );
     }
 
-    private void buildStates(Map<Integer, DeviceCommandCompiler> commandCompilers) {
-        stateMachinePojo.getStates().forEach(state -> buildSingleState(state, commandCompilers));
+    private void buildStates(Map<Integer, DeviceCommandCompiler> commandCompilers) throws CompilationException {
+        for (StatePojo state : stateMachinePojo.getStates()) {
+            try {
+                // inside this method we might call one or more device command compilers and
+                // nobody knows what might happen ...
+                buildSingleState(state, commandCompilers);
+            } catch (Exception e) {
+                throw new CompilationException(
+                        "Exception while compiling state '" + state.getName() + "': " + e.getMessage(), e);
+            }
+        }
     }
 
     private void buildSingleState(StatePojo statePojo, Map<Integer, DeviceCommandCompiler> commandCompilers) {

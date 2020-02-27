@@ -84,6 +84,24 @@ class StateMachineParserImplTest {
         assertTrue(message.contains("missing"), "Failed message: " + message);
     }
 
+    @Test
+    void exceptionFromDeviceCommandCompilerIsForwarded() throws IOException, MalformedInputException {
+        final String json = readResourceTextFile("simple_exit_enter.json");
+        final StateMachineParser parser = new StateMachineParserImpl();
+        final StateMachineCompiler compiler = parser.parseAndListRequiredDeviceIds(json);
+        assertNotNull(compiler);
+        assertNotNull(compiler.getRequiredDevices());
+
+        final Set<Integer> devices = compiler.getRequiredDevices();
+        assertEquals(1, devices.size());
+        assertTrue(devices.contains(10));
+
+        StringBuffer buffer = new StringBuffer();
+        assertThrows(CompilationException.class, () -> compiler.compileStateMachine(
+                Map.of(10, new BadDeviceCommandCompiler())
+        ));
+    }
+
     private String readResourceTextFile(String filename) throws IOException {
         try (
                 final InputStream input = this.getClass().getResourceAsStream(filename);
@@ -123,6 +141,13 @@ class StateMachineParserImplTest {
         @Override
         public DeviceCommand compile(String commandString) {
             return new LogDeviceCommand(customPrefix, sb, commandString);
+        }
+    }
+
+    private static class BadDeviceCommandCompiler implements  DeviceCommandCompiler {
+        @Override
+        public DeviceCommand compile(String commandString) {
+            throw new RuntimeException("Really bad exception");
         }
     }
 }
