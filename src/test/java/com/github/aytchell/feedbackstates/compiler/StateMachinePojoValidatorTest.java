@@ -64,25 +64,25 @@ public class StateMachinePojoValidatorTest {
     @Test
     void unnamedStateWillThrow() {
         final String message = expectExceptionReturnMessage("unnamed_state.json");
-        assertTrue(message.contains("Anonymous state"), "Failed message: " + message);
+        assertTrue(message.contains("anonymous state"), "Failed message: " + message);
     }
 
     @Test
     void incompleteOnEntryWillThrow() {
-        final String message = expectExceptionReturnMessage("incomplete_onentry.json");
-        assertTrue(message.contains("Incomplete onEntry"), "Failed message: " + message);
+        final String message = expectExceptionReturnMessage("onentry_incomplete.json");
+        assertTrue(message.contains("incomplete onEntry"), "Failed message: " + message);
     }
 
     @Test
     void incompleteOnExitWillThrow() {
-        final String message = expectExceptionReturnMessage("incomplete_onexit.json");
-        assertTrue(message.contains("Incomplete onExit"), "Failed message: " + message);
+        final String message = expectExceptionReturnMessage("onexit_incomplete.json");
+        assertTrue(message.contains("incomplete onExit"), "Failed message: " + message);
     }
 
     @Test
     void incompleteTransitionWillThrow() {
-        final String message = expectExceptionReturnMessage("incomplete_transition.json");
-        assertTrue(message.contains("Incomplete transition"), "Failed message: " + message);
+        final String message = expectExceptionReturnMessage("transition_incomplete.json");
+        assertTrue(message.contains("incomplete transition"), "Failed message: " + message);
     }
 
     @Test
