@@ -2,8 +2,8 @@ package com.github.aytchell.feedbackstates.compiler;
 
 import com.github.aytchell.feedbackstates.DeviceCommand;
 import com.github.aytchell.feedbackstates.DeviceCommandCompiler;
-import com.github.aytchell.feedbackstates.StateMachineCompiler;
 import com.github.aytchell.feedbackstates.StateMachine;
+import com.github.aytchell.feedbackstates.StateMachineCompiler;
 import com.github.aytchell.feedbackstates.StateMachineParser;
 import com.github.aytchell.feedbackstates.exceptions.CompilationException;
 import com.github.aytchell.feedbackstates.exceptions.MalformedInputException;
@@ -13,11 +13,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class StateMachineParserImplTest {
     @Test

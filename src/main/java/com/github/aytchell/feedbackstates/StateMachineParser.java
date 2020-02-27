@@ -1,6 +1,5 @@
 package com.github.aytchell.feedbackstates;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.github.aytchell.feedbackstates.exceptions.MalformedInputException;
 
 public interface StateMachineParser {
