@@ -5,10 +5,10 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.github.aytchell</groupId>
-    <artifactId>feedback-state-machine</artifactId>
+    <artifactId>json-statemachine</artifactId>
     <version>1.0.0-SNAPSHOT</version>
 
-    <name>feedback state machine</name>
+    <name>json to state machine compiler</name>
     <description>
         This package can convert a json description of a state machine
         to an executable instance so it can be used with the
