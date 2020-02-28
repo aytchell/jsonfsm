@@ -56,9 +56,8 @@ class StateMachineParserImplTest {
         final StateMachineCompiler compiler = parser.parseAndListRequiredDeviceIds(json);
         assertNotNull(compiler);
         assertNotNull(compiler.getRequiredDevices());
-
-        final Set<Integer> devices = compiler.getRequiredDevices();
-        assertEquals(Set.of(1,2,3,4), devices);
+        assertEquals(Set.of(1,2,3,4), compiler.getRequiredDevices());
+        assertEquals(Set.of(1,2), compiler.getAcceptedEventSources());
 
         StringBuffer buffer = new StringBuffer();
 
@@ -68,6 +67,9 @@ class StateMachineParserImplTest {
         compilers.put(3, new LogDeviceCommandCompiler("3:", buffer));
         compilers.put(4, new LogDeviceCommandCompiler("4:", buffer));
         final StateMachine stateMachine = compiler.compileStateMachine(compilers);
+        assertEquals(Set.of(1,2,3,4), stateMachine.getControlledDeviceIds());
+        assertEquals(Set.of(1,2), stateMachine.getHandledEventSourceIds());
+
         stateMachine.inject(1, "move ya");
         assertEquals("1:Cmd1 2:Cmd2 3:Cmd3 4:Cmd4 ", buffer.toString());
     }

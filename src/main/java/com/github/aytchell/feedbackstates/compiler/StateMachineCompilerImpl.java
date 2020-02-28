@@ -20,12 +20,17 @@ import java.util.Set;
 public class StateMachineCompilerImpl implements StateMachineCompiler {
     @Getter
     private final Set<Integer> requiredDevices;
+    @Getter
+    private final Set<Integer> acceptedEventSources;
+
     private final TriggerTranslator mapping;
     private final StateMachinePojo stateMachinePojo;
     private final StateMachineConfig<String, String> config;
 
-    StateMachineCompilerImpl(Set<Integer> requiredDevices, StateMachinePojo stateMachinePojo) {
+    StateMachineCompilerImpl(Set<Integer> requiredDevices, Set<Integer> acceptedEventSources,
+            StateMachinePojo stateMachinePojo) {
         this.requiredDevices = requiredDevices;
+        this.acceptedEventSources = acceptedEventSources;
         mapping = new TriggerTranslator();
         this.stateMachinePojo = stateMachinePojo;
         this.config = new StateMachineConfig<>();
@@ -42,7 +47,7 @@ public class StateMachineCompilerImpl implements StateMachineCompiler {
         final com.github.oxo42.stateless4j.StateMachine<String, String> stateMachine =
                 new com.github.oxo42.stateless4j.StateMachine<>(initialState, config);
 
-        return new StateMachineImpl(stateMachine, mapping);
+        return new StateMachineImpl(stateMachine, requiredDevices, acceptedEventSources, mapping);
     }
 
     private void checkGivenCompilers(Map<Integer, DeviceCommandCompiler> commandCompilers) throws CompilationException {

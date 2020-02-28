@@ -7,6 +7,10 @@
           "name" : "move",
           "eventSourceId" : 1,
           "eventPayload" : "move ya"
+      }, {
+          "name" : "stop",
+          "eventSourceId" : 2,
+          "eventPayload" : "stop it"
       }
   ],
   "states" : [
@@ -22,7 +26,11 @@
       "transitions" : [{
           "triggerName" : "move",
           "targetState" : "Stop"
-      }]
+      }, {
+          "triggerName" : "stop",
+          "targetState" : "Stop"
+      }
+      ]
     },
     {
       "name" : "Stop",

@@ -27,8 +27,9 @@ public class StateMachineParserImpl implements StateMachineParser {
         final StateMachinePojo stateMachinePojo = parseJsonToPojo(jsonDescription);
         StateMachinePojoValidator.validate(stateMachinePojo);
         final Set<Integer> devices = extractRequiredDeviceIds(stateMachinePojo);
+        final Set<Integer> eventSources = extractAcceptedEventSources(stateMachinePojo);
 
-        return new StateMachineCompilerImpl(devices, stateMachinePojo);
+        return new StateMachineCompilerImpl(devices, eventSources, stateMachinePojo);
     }
 
     private StateMachinePojo parseJsonToPojo(String jsonDescription) throws MalformedInputException {
@@ -45,6 +46,12 @@ public class StateMachineParserImpl implements StateMachineParser {
         stateMachine.getStates().stream()
                 .map(this::extractRequiredDeviceIds)
                 .forEach(ids::addAll);
+        return ids;
+    }
+
+    private Set<Integer> extractAcceptedEventSources(StateMachinePojo stateMachine) {
+        Set<Integer> ids = new HashSet<>();
+        stateMachine.getTriggers().forEach(t -> ids.add(t.getEventSourceId()));
         return ids;
     }
 
