@@ -81,7 +81,8 @@ public class StateMachineCompilerImpl implements StateMachineCompiler {
         }
     }
 
-    private void buildSingleState(StatePojo statePojo, Map<Integer, DeviceCommandCompiler> commandCompilers) {
+    private void buildSingleState(StatePojo statePojo, Map<Integer, DeviceCommandCompiler> commandCompilers)
+            throws CompilationException {
         final String name = statePojo.getName();
         StateConfiguration<String, String> state = config.configure(name);
         addEntryCommandsToState(state, statePojo.getOnEntry(), commandCompilers);
@@ -90,7 +91,8 @@ public class StateMachineCompilerImpl implements StateMachineCompiler {
     }
 
     private void addEntryCommandsToState(StateConfiguration<String, String> state,
-            List<CommandPojo> entryCommands, Map<Integer, DeviceCommandCompiler> commandCompilers) {
+            List<CommandPojo> entryCommands, Map<Integer, DeviceCommandCompiler> commandCompilers)
+            throws CompilationException {
         if (entryCommands == null || entryCommands.isEmpty()) {
             return;
         }
@@ -102,7 +104,8 @@ public class StateMachineCompilerImpl implements StateMachineCompiler {
     }
 
     private void addExitCommandsToState(StateConfiguration<String, String> state,
-            List<CommandPojo> exitCommands, Map<Integer, DeviceCommandCompiler> commandCompilers) {
+            List<CommandPojo> exitCommands, Map<Integer, DeviceCommandCompiler> commandCompilers)
+            throws CompilationException {
         if (exitCommands == null || exitCommands.isEmpty()) {
             return;
         }
