@@ -122,7 +122,12 @@ public class StateMachineCompilerImpl implements StateMachineCompiler {
         }
 
         for (TransitionPojo t : transitions) {
-            state.permit(t.getTriggerName(), t.getTargetState());
+            final Boolean ignore = t.getIgnore();
+            if (ignore == null || !ignore) {
+                state.permit(t.getTriggerName(), t.getTargetState());
+            } else {
+                state.ignore(t.getTriggerName());
+            }
         }
     }
 }

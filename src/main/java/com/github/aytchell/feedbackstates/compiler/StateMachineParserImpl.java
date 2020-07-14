@@ -37,7 +37,7 @@ public class StateMachineParserImpl implements StateMachineParser {
             return mapper.readValue(jsonDescription, new TypeReference<StateMachinePojo>() {
             });
         } catch (JsonProcessingException e) {
-            throw new MalformedInputException("Error while parsing given json");
+            throw new MalformedInputException("Error while parsing given json: " + e.getMessage());
         }
     }
 

@@ -98,6 +98,49 @@ public class StateMachineCompilerImplTest {
         ));
     }
 
+    @Test
+    void superfluousIgnoreIsIgnored() throws IOException, MalformedInputException, CompilationException {
+        final String json = readResourceTextFile("ignore_false.json");
+        final StateMachineParser parser = new StateMachineParserImpl();
+        final StateMachineCompiler compiler = parser.parseAndListRequiredDeviceIds(json);
+        assertNotNull(compiler);
+        assertNotNull(compiler.getRequiredDevices());
+
+        final Set<Integer> devices = compiler.getRequiredDevices();
+        assertEquals(1, devices.size());
+        assertTrue(devices.contains(10));
+
+        StringBuffer buffer = new StringBuffer();
+        final StateMachine stateMachine = compiler.compileStateMachine(
+                Map.of(10, new LogDeviceCommandCompiler("", buffer)));
+        stateMachine.inject(1, "move ya");
+
+        // Ensure that the transition is taken even though there is an 'ignored' entry
+        assertEquals("Exit 'Start' Enter 'Stop'", buffer.toString());
+    }
+
+    @Test
+    void ignoreEntryIsRespected() throws IOException, MalformedInputException, CompilationException {
+        final String json = readResourceTextFile("ignore_true.json");
+        final StateMachineParser parser = new StateMachineParserImpl();
+        final StateMachineCompiler compiler = parser.parseAndListRequiredDeviceIds(json);
+        assertNotNull(compiler);
+        assertNotNull(compiler.getRequiredDevices());
+
+        final Set<Integer> devices = compiler.getRequiredDevices();
+        assertEquals(1, devices.size());
+        assertTrue(devices.contains(10));
+
+        StringBuffer buffer = new StringBuffer();
+        final StateMachine stateMachine = compiler.compileStateMachine(
+                Map.of(10, new LogDeviceCommandCompiler("", buffer)));
+        stateMachine.inject(1, "move ya");
+
+        // Ensure that the transition is NOT taken (the trigger should be accepted by the state machine but ignored)
+        final String content = buffer.toString();
+        assertTrue(content.isEmpty(), String.format("Buffer should be empty but is '%s'", content));
+    }
+
     private String readResourceTextFile(String filename) throws IOException {
         try (
                 final InputStream input = this.getClass().getResourceAsStream(filename);

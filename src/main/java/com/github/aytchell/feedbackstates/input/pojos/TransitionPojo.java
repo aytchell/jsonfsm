@@ -6,4 +6,5 @@ import lombok.Data;
 public class TransitionPojo {
     private String triggerName;
     private String targetState;
+    private Boolean ignore;
 }
