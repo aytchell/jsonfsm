@@ -16,7 +16,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class StateMachineParserImpl implements StateMachineParser {
-    private ObjectMapper mapper = new ObjectMapper();
+    private final ObjectMapper mapper = new ObjectMapper();
 
     @Override
     public StateMachineCompiler parseAndListRequiredDeviceIds(String jsonDescription) throws MalformedInputException {

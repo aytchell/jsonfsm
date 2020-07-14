@@ -17,6 +17,6 @@ public class TriggerTranslator {
     }
 
     private String computeKey(int eventSourceId, String eventPayload) {
-        return Integer.toString(eventSourceId) + "_" + eventPayload;
+        return eventSourceId + "_" + eventPayload;
     }
 }

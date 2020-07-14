@@ -16,12 +16,12 @@ public class StateMachinePojoValidator {
     private final Set<String> knownStateNames = new HashSet<>();
     private final Set<String> knownTriggerNames = new HashSet<>();
 
-    public static void validate(StateMachinePojo pojo) throws MalformedInputException {
-        new StateMachinePojoValidator(pojo).validate();
-    }
-
     private StateMachinePojoValidator(StateMachinePojo stateMachinePojo) {
         this.stateMachinePojo = stateMachinePojo;
+    }
+
+    public static void validate(StateMachinePojo pojo) throws MalformedInputException {
+        new StateMachinePojoValidator(pojo).validate();
     }
 
     private void validate() throws MalformedInputException {
