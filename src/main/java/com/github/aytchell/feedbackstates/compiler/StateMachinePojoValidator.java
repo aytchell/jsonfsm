@@ -118,21 +118,43 @@ public class StateMachinePojoValidator {
             }
             for (TransitionPojo t : transitions) {
                 throwIfTransitionIsIncomplete(t);
-                throwIfTargetStateIsUnknown(t);
                 throwIfTriggerNameIsUnknown(t);
+                throwIfTargetStateIsUnknown(t);
             }
         }
     }
 
     private void throwIfTransitionIsIncomplete(TransitionPojo transition) throws MalformedInputException {
-        if (transition.getTargetState() == null || transition.getTriggerName() == null) {
+        if (!transitionIsComplete(transition)) {
             throw new MalformedInputException(
                     "Encountered incomplete transition. " +
-                    "A transition must always contain 'targetState' and 'triggerName'.");
+                    "A transition must always 'triggerName' and either 'targetState' or 'ignore':'true'.");
         }
     }
 
+    private boolean transitionIsComplete(TransitionPojo transition) {
+        if (transition.getTriggerName() == null) {
+            return false;
+        }
+
+        // at this point 'triggerName' != null
+        if (transition.getTargetState() != null) {
+            // for validation we don't care if there's an additional 'ignore'
+            return true;
+        }
+
+        // no 'targetState' given so there has to be 'ignore' and it must be 'true'
+        final Boolean ignore = transition.getIgnore();
+        return (ignore != null) && ignore;
+    }
+
     private void throwIfTargetStateIsUnknown(TransitionPojo transition) throws MalformedInputException {
+        final Boolean ignore = transition.getIgnore();
+        if ((ignore != null) && ignore) {
+            // transition is ignored. No need for a targetState
+            return;
+        }
+
         if (!knownStateNames.contains(transition.getTargetState())) {
             throw new MalformedInputException(
                     "Encountered unknown targetState '" + transition.getTargetState() + "' of transition.");

@@ -18,7 +18,6 @@
       }],
       "transitions" : [{
           "triggerName" : "move",
-          "targetState" : "Stop",
           "ignore" : "true"
       }]
     },
