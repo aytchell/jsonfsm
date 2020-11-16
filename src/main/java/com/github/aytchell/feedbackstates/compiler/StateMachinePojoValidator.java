@@ -1,11 +1,11 @@
 package com.github.aytchell.feedbackstates.compiler;
 
-import com.github.aytchell.feedbackstates.exceptions.MalformedInputException;
 import com.github.aytchell.feedbackstates.input.pojos.CommandPojo;
 import com.github.aytchell.feedbackstates.input.pojos.StateMachinePojo;
 import com.github.aytchell.feedbackstates.input.pojos.StatePojo;
 import com.github.aytchell.feedbackstates.input.pojos.TransitionPojo;
-import com.github.aytchell.feedbackstates.input.pojos.TriggerPojo;
+import com.github.aytchell.validator.Validator;
+import com.github.aytchell.validator.exceptions.ValidationException;
 
 import java.util.HashSet;
 import java.util.List;
@@ -20,11 +20,11 @@ class StateMachinePojoValidator {
         this.stateMachinePojo = stateMachinePojo;
     }
 
-    public static void validate(StateMachinePojo pojo) throws MalformedInputException {
+    public static void validate(StateMachinePojo pojo) throws ValidationException {
         new StateMachinePojoValidator(pojo).validate();
     }
 
-    private void validate() throws MalformedInputException {
+    private void validate() throws ValidationException {
         validateTriggers();
 
         // The following method needs the list of all trigger names which is compiled
@@ -36,165 +36,68 @@ class StateMachinePojoValidator {
         validateOptions();
     }
 
-    private void validateTriggers() throws MalformedInputException {
-        throwIfTriggersAreMissing();
-        throwIfAnyTriggerIsIncomplete();
+    private void validateTriggers() throws ValidationException {
+        Validator.expect(stateMachinePojo.getTriggers(), "triggers").notNull().notEmpty()
+                .eachCustomEntry(
+                        trigger -> {
+                            Validator.expect(trigger.getName(), "name").notNull().notBlank();
+                            Validator.expect(trigger.getEventSourceId(), "eventSourceId").notNull().greaterThan(0);
+                            Validator.expect(trigger.getEventPayload(), "eventPayload").notNull().notBlank();
+                            knownTriggerNames.add(trigger.getName());
+                        }
+                );
     }
 
-    private void validateStates() throws MalformedInputException {
-        throwIfStatesAreMissing();
-        validateEverySingleState();
+    private void validateStates() throws ValidationException {
+        Validator.expect(stateMachinePojo.getStates(), "states").notNull().notEmpty().eachCustomEntry(
+                state -> {
+                    Validator.expect(state.getName(), "name").notNull().notBlank();
+                    expectCommandListIsCompleteIfGiven(state.getOnEntry(), "onEntry");
+                    expectCommandListIsCompleteIfGiven(state.getOnExit(), "onExit");
 
-        // For validating the transitions we need to have a list of all known state names
-        // this list is compiled during validateEverySingleState. That's why we don't check
-        // transitions in the later method but have a separate method.
-        validateEverySingleTransition();
+                    // For validating the transitions we need to have a list of all known state names
+                    knownStateNames.add(state.getName());
+                });
+
+        // the validation step above compiles a list of known states. When validating the transitions we need to have
+        // a complete list of known states that's why we need a separate loop over all the states
+        Validator.expect(stateMachinePojo.getStates(), "states").notNull().notEmpty().eachCustomEntry(
+                state -> {
+                    Validator.expect(state.getTransitions(), "transitions").ifNotNull()
+                            .eachCustomEntry(this::validateTransition);
+                });
     }
 
-    private void validateOptions() throws MalformedInputException {
-        throwIfOptionsAreMissing();
-        throwIfInitialStateIsMissing();
-        throwIfInitialStateIsUnknown();
+    private void validateOptions() throws ValidationException {
+        Validator.expect(stateMachinePojo.getOptions(), "options").notNull().passes(
+                options -> {
+                    Validator.expect(options.getInitialState(), "initialState").notNull().notBlank()
+                            .passes(knownStateNames::contains, "is contained in states");
+                });
     }
 
-    private void throwIfOptionsAreMissing() throws MalformedInputException {
-        if (stateMachinePojo.getOptions() == null) {
-            throw new MalformedInputException("StateMachine contains no options");
-        }
+    private void validateTransition(TransitionPojo transition) throws ValidationException {
+        Validator.expect(transition.getTriggerName(), "triggerName").notNull().notBlank()
+                .passes(knownTriggerNames::contains, "is a known triggerName");
+        Validator.expect(transition.getTargetState(), "targetState",
+                "alternatively add 'transition.ignore = true'").ifNotGivenOrFalse(transition.getIgnore())
+                // if 'ignore' is given and 'true' we skip the test. Otherwise continue with the check
+                .notNull();
+        Validator.expect(transition.getTargetState(), "targetState").ifNotGivenOrFalse(transition.getIgnore())
+                // no extraInfo if the name is malformed
+                .notNull().notBlank().passes(knownStateNames::contains, "is contained in states");
+        Validator.expect(transition.getIgnore(), "ignore")
+                .ifTrue(transition.getTargetState() == null)
+                // no 'targetState' given so there has to be 'ignore' and it must be 'true'
+                .notNull().isTrue();
     }
 
-    private void throwIfInitialStateIsMissing() throws MalformedInputException {
-        final String initStateName = stateMachinePojo.getOptions().getInitialState();
-        if (initStateName == null) {
-            throw new MalformedInputException("StateMachine contains no initial state");
-        }
-    }
-
-    private void throwIfInitialStateIsUnknown() throws MalformedInputException {
-        final String initStateName = stateMachinePojo.getOptions().getInitialState();
-        if (!knownStateNames.contains(initStateName)) {
-            throw new MalformedInputException("Initial state doesn't denote a known state");
-        }
-    }
-
-    private void throwIfTriggersAreMissing() throws MalformedInputException {
-        if (stateMachinePojo.getTriggers() == null || stateMachinePojo.getTriggers().isEmpty()) {
-            throw new MalformedInputException("StateMachine contains no triggers");
-        }
-    }
-
-    private void throwIfAnyTriggerIsIncomplete() throws MalformedInputException {
-        List<TriggerPojo> triggers = stateMachinePojo.getTriggers();
-        for (TriggerPojo t : triggers) {
-            if (t.getName() == null || t.getEventSourceId() == null || t.getEventPayload() == null) {
-                throw new MalformedInputException(
-                        "Encountered incomplete trigger. " +
-                        "A trigger must always contain 'name', 'eventSourceId' and 'eventPayload'.");
-            }
-            knownTriggerNames.add(t.getName());
-        }
-    }
-
-    private void throwIfStatesAreMissing() throws MalformedInputException {
-        if (stateMachinePojo.getStates() == null || stateMachinePojo.getStates().isEmpty()) {
-            throw new MalformedInputException("StateMachine contains no states");
-        }
-    }
-
-    private void validateEverySingleState() throws MalformedInputException {
-        for (StatePojo s : stateMachinePojo.getStates()) {
-            throwIfNameIsMissing(s);
-            throwIfOnEntryIsIncomplete(s);
-            throwIfOnExitIsIncomplete(s);
-        }
-    }
-
-    private void validateEverySingleTransition() throws MalformedInputException {
-        for (StatePojo s : stateMachinePojo.getStates()) {
-            List<TransitionPojo> transitions = s.getTransitions();
-            if (transitions == null) {
-                // This is a final state. There's no way out.
-                continue;
-            }
-            for (TransitionPojo t : transitions) {
-                throwIfTransitionIsIncomplete(t);
-                throwIfTriggerNameIsUnknown(t);
-                throwIfTargetStateIsUnknown(t);
-            }
-        }
-    }
-
-    private void throwIfTransitionIsIncomplete(TransitionPojo transition) throws MalformedInputException {
-        if (!transitionIsComplete(transition)) {
-            throw new MalformedInputException(
-                    "Encountered incomplete transition. " +
-                    "A transition must always 'triggerName' and either 'targetState' or 'ignore':'true'.");
-        }
-    }
-
-    private boolean transitionIsComplete(TransitionPojo transition) {
-        if (transition.getTriggerName() == null) {
-            return false;
-        }
-
-        // at this point 'triggerName' != null
-        if (transition.getTargetState() != null) {
-            // for validation we don't care if there's an additional 'ignore'
-            return true;
-        }
-
-        // no 'targetState' given so there has to be 'ignore' and it must be 'true'
-        final Boolean ignore = transition.getIgnore();
-        return (ignore != null) && ignore;
-    }
-
-    private void throwIfTargetStateIsUnknown(TransitionPojo transition) throws MalformedInputException {
-        final Boolean ignore = transition.getIgnore();
-        if ((ignore != null) && ignore) {
-            // transition is ignored. No need for a targetState
-            return;
-        }
-
-        if (!knownStateNames.contains(transition.getTargetState())) {
-            throw new MalformedInputException(
-                    "Encountered unknown targetState '" + transition.getTargetState() + "' of transition.");
-        }
-    }
-
-    private void throwIfTriggerNameIsUnknown(TransitionPojo transition) throws MalformedInputException {
-        if (!knownTriggerNames.contains(transition.getTriggerName())) {
-            throw new MalformedInputException(
-                    "Encountered unknown triggerName '" + transition.getTriggerName() + "' of transition.");
-        }
-    }
-
-    private void throwIfNameIsMissing(StatePojo state) throws MalformedInputException {
-        if (state.getName() == null) {
-            throw new MalformedInputException("Encountered anonymous state. Please give every state a name.");
-        }
-        knownStateNames.add(state.getName());
-    }
-
-    private void throwIfOnEntryIsIncomplete(StatePojo state) throws MalformedInputException {
-        throwIfCommandListIsIncomplete(state.getOnEntry(), "onEntry");
-    }
-
-    private void throwIfOnExitIsIncomplete(StatePojo state) throws MalformedInputException {
-        throwIfCommandListIsIncomplete(state.getOnExit(), "onExit");
-    }
-
-    private void throwIfCommandListIsIncomplete(List<CommandPojo> commands, String name) throws MalformedInputException {
-        if (commands == null) {
-            // it's OK to have no command list at all
-            return;
-        }
-
-        for (CommandPojo cmd : commands) {
-            if (cmd.getDeviceId() == null || cmd.getCommandString() == null) {
-                throw new MalformedInputException(
-                        "Encountered incomplete " + name + " command. " +
-                        "An " + name + " must always contain 'deviceId' and 'commandString'.");
-            }
-        }
+    private void expectCommandListIsCompleteIfGiven(List<CommandPojo> commands, String name) throws ValidationException {
+        Validator.expect(commands, name).ifNotNull().eachCustomEntry(
+                cmd -> {
+                    Validator.expect(cmd.getDeviceId(), "deviceId").notNull().greaterThan(0);
+                    Validator.expect(cmd.getCommandString(), "commandString").notNull().notBlank();
+                }
+        );
     }
 }

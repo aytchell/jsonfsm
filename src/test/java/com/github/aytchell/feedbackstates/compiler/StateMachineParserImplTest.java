@@ -1,17 +1,21 @@
 package com.github.aytchell.feedbackstates.compiler;
 
 import com.github.aytchell.feedbackstates.StateMachineParser;
-import com.github.aytchell.feedbackstates.exceptions.MalformedInputException;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import java.util.List;
+
+import static com.github.aytchell.feedbackstates.compiler.ExceptionMessageChecks.assertThrowsAndMessageReadsLike;
 
 class StateMachineParserImplTest {
     @Test
-    void emptyInputGivenThrows() throws MalformedInputException {
-        assertThrows(MalformedInputException.class,
-                () -> StateMachineParser.parseAndListRequiredDeviceIds(null));
-        assertThrows(MalformedInputException.class,
-                () -> StateMachineParser.parseAndListRequiredDeviceIds(""));
+    void emptyInputGivenThrows() {
+        assertThrowsAndMessageReadsLike(
+                () -> StateMachineParser.parseAndListRequiredDeviceIds(null),
+                List.of("'jsonStateMachine'", "is not null"));
+
+        assertThrowsAndMessageReadsLike(
+                () -> StateMachineParser.parseAndListRequiredDeviceIds(""),
+                List.of("'jsonStateMachine'", "is not blank"));
     }
 }

@@ -4,11 +4,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.aytchell.feedbackstates.StateMachineCompiler;
-import com.github.aytchell.feedbackstates.StateMachineParser;
-import com.github.aytchell.feedbackstates.exceptions.MalformedInputException;
 import com.github.aytchell.feedbackstates.input.pojos.CommandPojo;
 import com.github.aytchell.feedbackstates.input.pojos.StateMachinePojo;
 import com.github.aytchell.feedbackstates.input.pojos.StatePojo;
+import com.github.aytchell.validator.Validator;
+import com.github.aytchell.validator.exceptions.ValidationException;
 
 import java.util.HashSet;
 import java.util.List;
@@ -18,10 +18,8 @@ import java.util.stream.Collectors;
 public class StateMachineParserImpl {
     private final ObjectMapper mapper = new ObjectMapper();
 
-    public StateMachineCompiler parseAndListRequiredDeviceIds(String jsonDescription) throws MalformedInputException {
-        if (jsonDescription == null || jsonDescription.isEmpty()) {
-            throw new MalformedInputException("StateMachine description is empty");
-        }
+    public StateMachineCompiler parseAndListRequiredDeviceIds(String jsonDescription) throws ValidationException {
+        Validator.expect(jsonDescription, "jsonStateMachine").notNull().notBlank();
 
         final StateMachinePojo stateMachinePojo = parseJsonToPojo(jsonDescription);
         StateMachinePojoValidator.validate(stateMachinePojo);
@@ -31,12 +29,12 @@ public class StateMachineParserImpl {
         return new StateMachineCompilerImpl(devices, eventSources, stateMachinePojo);
     }
 
-    private StateMachinePojo parseJsonToPojo(String jsonDescription) throws MalformedInputException {
+    private StateMachinePojo parseJsonToPojo(String jsonDescription) throws ValidationException {
         try {
-            return mapper.readValue(jsonDescription, new TypeReference<StateMachinePojo>() {
+            return mapper.readValue(jsonDescription, new TypeReference<>() {
             });
         } catch (JsonProcessingException e) {
-            throw new MalformedInputException("Error while parsing given json: " + e.getMessage());
+            throw new ValidationException("Error while parsing given json: " + e.getMessage());
         }
     }
 
@@ -63,7 +61,7 @@ public class StateMachineParserImpl {
 
     private Set<Integer> extractRequiredEntryDeviceIds(StatePojo state) {
         List<CommandPojo> entries = state.getOnEntry();
-        if (entries == null) {
+        if (entries == null || entries.isEmpty()) {
             return Set.of();
         }
 
@@ -72,7 +70,7 @@ public class StateMachineParserImpl {
 
     private Set<Integer> extractRequiredExitDeviceIds(StatePojo state) {
         List<CommandPojo> exits = state.getOnExit();
-        if (exits == null) {
+        if (exits == null || exits.isEmpty()) {
             return Set.of();
         }
 

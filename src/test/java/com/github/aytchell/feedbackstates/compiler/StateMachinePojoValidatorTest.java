@@ -1,116 +1,93 @@
 package com.github.aytchell.feedbackstates.compiler;
 
-import com.github.aytchell.feedbackstates.StateMachineParser;
-import com.github.aytchell.feedbackstates.exceptions.MalformedInputException;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
+import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static com.github.aytchell.feedbackstates.compiler.ExceptionMessageChecks.parseFileAssertThrowsAndMessageReadsLike;
 
 public class StateMachinePojoValidatorTest {
     @Test
     void missingOptionsWillThrow() {
-        final String message = expectExceptionReturnMessage("options_missing.json");
-        assertTrue(message.contains("no options"), "Failed message: " + message);
+        parseFileAssertThrowsAndMessageReadsLike("options_missing.json",
+                List.of("'options'", "is not null"));
     }
 
     @Test
     void missingInitialStateWillThrow() {
-        final String message = expectExceptionReturnMessage("initial_state_missing.json");
-        assertTrue(message.contains("no initial state"), "Failed message: " + message);
+        parseFileAssertThrowsAndMessageReadsLike("initial_state_missing.json",
+                List.of("'options.initialState'", "is not null"));
     }
 
     @Test
     void initialStateDenotesUnkownState() {
-        final String message = expectExceptionReturnMessage("unknown_initial_state.json");
-        assertTrue(message.contains("Initial state"), "Failed message: " + message);
-        assertTrue(message.contains("known state"), "Failed message: " + message);
+        parseFileAssertThrowsAndMessageReadsLike("unknown_initial_state.json",
+                List.of("'options.initialState'", "value: 'Starting'", "contained in states"));
     }
 
     @Test
     void missingTriggersWillThrow() {
-        final String message = expectExceptionReturnMessage("triggers_missing.json");
-        assertTrue(message.contains("no triggers"), "Failed message: " + message);
+        parseFileAssertThrowsAndMessageReadsLike("triggers_missing.json",
+                List.of("'triggers'", "is not null"));
     }
 
     @Test
     void emptyTriggersWillThrow() {
-        final String message = expectExceptionReturnMessage("triggers_empty.json");
-        assertTrue(message.contains("no triggers"), "Failed message: " + message);
+        parseFileAssertThrowsAndMessageReadsLike("triggers_empty.json",
+                List.of("'triggers'", "type: List", "is not empty"));
     }
 
     @Test
     void missingStatesWillThrow() {
-        final String message = expectExceptionReturnMessage("states_missing.json");
-        assertTrue(message.contains("no states"), "Failed message: " + message);
+        parseFileAssertThrowsAndMessageReadsLike("states_missing.json",
+                List.of("'states'", "is not null"));
     }
 
     @Test
     void emptyStatesWillThrow() {
-        final String message = expectExceptionReturnMessage("states_empty.json");
-        assertTrue(message.contains("no states"), "Failed message: " + message);
+        parseFileAssertThrowsAndMessageReadsLike("states_empty.json",
+                List.of("'states'", "type: List", "is not empty"));
     }
 
     @Test
     void incompleteTriggerWillThrow() {
-        final String message = expectExceptionReturnMessage("trigger_incomplete.json");
-        assertTrue(message.contains("incomplete trigger"), "Failed message: " + message);
+        parseFileAssertThrowsAndMessageReadsLike("trigger_incomplete.json",
+                List.of("'triggers[0].eventPayload'", "is not null"));
     }
 
     @Test
     void unnamedStateWillThrow() {
-        final String message = expectExceptionReturnMessage("unnamed_state.json");
-        assertTrue(message.contains("anonymous state"), "Failed message: " + message);
+        parseFileAssertThrowsAndMessageReadsLike("unnamed_state.json",
+                List.of("'states[1].name'", "is not null"));
     }
 
     @Test
     void incompleteOnEntryWillThrow() {
-        final String message = expectExceptionReturnMessage("onentry_incomplete.json");
-        assertTrue(message.contains("incomplete onEntry"), "Failed message: " + message);
+        parseFileAssertThrowsAndMessageReadsLike("onentry_incomplete.json",
+                List.of("'states[1].onEntry[0].commandString'", "is not null"));
     }
 
     @Test
     void incompleteOnExitWillThrow() {
-        final String message = expectExceptionReturnMessage("onexit_incomplete.json");
-        assertTrue(message.contains("incomplete onExit"), "Failed message: " + message);
+        parseFileAssertThrowsAndMessageReadsLike("onexit_incomplete.json",
+                List.of("'states[0].onExit[0].deviceId", "is not null"));
     }
 
     @Test
     void incompleteTransitionWillThrow() {
-        final String message = expectExceptionReturnMessage("transition_incomplete.json");
-        assertTrue(message.contains("incomplete transition"), "Failed message: " + message);
+        parseFileAssertThrowsAndMessageReadsLike("transition_incomplete.json",
+                List.of("'states[0].transitions[0].targetState'", "alternatively add", "ignore", "is not null"));
     }
 
     @Test
     void unknownTriggerNameWillThrow() {
-        final String message = expectExceptionReturnMessage("unknown_trigger_name.json");
-        assertTrue(message.contains("triggerName"), "Failed message: " + message);
-        assertTrue(message.contains("unknown"), "Failed message: " + message);
+        parseFileAssertThrowsAndMessageReadsLike("unknown_trigger_name.json",
+                List.of("'states[0].transitions[0].triggerName'", "moveya", "is a known triggerName"));
     }
 
     @Test
     void unknownTargetStateWillThrow() {
-        final String message = expectExceptionReturnMessage("unknown_target_state.json");
-        assertTrue(message.contains("targetState"), "Failed message: " + message);
-        assertTrue(message.contains("unknown"), "Failed message: " + message);
-    }
-
-    private String expectExceptionReturnMessage(String filename) {
-        final Exception e = assertThrows(MalformedInputException.class,
-                () -> StateMachineParser.parseAndListRequiredDeviceIds(readResourceTextFile(filename)));
-        return e.getMessage();
-    }
-
-    private String readResourceTextFile(String filename) throws IOException {
-        try (
-                final InputStream input = this.getClass().getResourceAsStream(filename);
-        ) {
-            byte[] content = input.readAllBytes();
-            return new String(content, StandardCharsets.UTF_8);
-        }
+        parseFileAssertThrowsAndMessageReadsLike("unknown_target_state.json",
+                List.of("'states[0].transitions[0].targetState'", "'Stopped'", "is contained in states"));
     }
 }

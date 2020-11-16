@@ -6,7 +6,7 @@ import com.github.aytchell.feedbackstates.StateMachine;
 import com.github.aytchell.feedbackstates.StateMachineCompiler;
 import com.github.aytchell.feedbackstates.StateMachineParser;
 import com.github.aytchell.feedbackstates.exceptions.CompilationException;
-import com.github.aytchell.feedbackstates.exceptions.MalformedInputException;
+import com.github.aytchell.validator.exceptions.ValidationException;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -23,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class StateMachineCompilerImplTest {
     @Test
-    void commandOnExitAndEnter() throws IOException, MalformedInputException, CompilationException {
+    void commandOnExitAndEnter() throws IOException, ValidationException, CompilationException {
         final String json = readResourceTextFile("simple_exit_enter.json");
         final StateMachineCompiler compiler = StateMachineParser.parseAndListRequiredDeviceIds(json);
         assertNotNull(compiler);
@@ -41,13 +41,13 @@ public class StateMachineCompilerImplTest {
     }
 
     @Test
-    void multipleDevicesAndCommands() throws IOException, MalformedInputException, CompilationException {
+    void multipleDevicesAndCommands() throws IOException, ValidationException, CompilationException {
         final String json = readResourceTextFile("multiple_devices_and_cmds.json");
         final StateMachineCompiler compiler = StateMachineParser.parseAndListRequiredDeviceIds(json);
         assertNotNull(compiler);
         assertNotNull(compiler.getRequiredDevices());
-        assertEquals(Set.of(1,2,3,4), compiler.getRequiredDevices());
-        assertEquals(Set.of(1,2), compiler.getAcceptedEventSources());
+        assertEquals(Set.of(1, 2, 3, 4), compiler.getRequiredDevices());
+        assertEquals(Set.of(1, 2), compiler.getAcceptedEventSources());
 
         StringBuffer buffer = new StringBuffer();
 
@@ -57,15 +57,15 @@ public class StateMachineCompilerImplTest {
         compilers.put(3, new LogDeviceCommandCompiler("3:", buffer));
         compilers.put(4, new LogDeviceCommandCompiler("4:", buffer));
         final StateMachine stateMachine = compiler.compileStateMachine(compilers);
-        assertEquals(Set.of(1,2,3,4), stateMachine.getControlledDeviceIds());
-        assertEquals(Set.of(1,2), stateMachine.getHandledEventSourceIds());
+        assertEquals(Set.of(1, 2, 3, 4), stateMachine.getControlledDeviceIds());
+        assertEquals(Set.of(1, 2), stateMachine.getHandledEventSourceIds());
 
         stateMachine.inject(1, "move ya");
         assertEquals("1:Cmd1 2:Cmd2 3:Cmd3 4:Cmd4 ", buffer.toString());
     }
 
     @Test
-    void notEnoughDeviceCompilersGivenThrows() throws IOException, MalformedInputException {
+    void notEnoughDeviceCompilersGivenThrows() throws IOException, ValidationException {
         final String json = readResourceTextFile("multiple_devices_and_cmds.json");
         final StateMachineCompiler compiler = StateMachineParser.parseAndListRequiredDeviceIds(json);
 
@@ -78,7 +78,7 @@ public class StateMachineCompilerImplTest {
     }
 
     @Test
-    void exceptionFromDeviceCommandCompilerIsForwarded() throws IOException, MalformedInputException {
+    void exceptionFromDeviceCommandCompilerIsForwarded() throws IOException, ValidationException {
         final String json = readResourceTextFile("simple_exit_enter.json");
         final StateMachineCompiler compiler = StateMachineParser.parseAndListRequiredDeviceIds(json);
         assertNotNull(compiler);
@@ -95,7 +95,7 @@ public class StateMachineCompilerImplTest {
     }
 
     @Test
-    void superfluousIgnoreIsIgnored() throws IOException, MalformedInputException, CompilationException {
+    void superfluousIgnoreIsIgnored() throws IOException, ValidationException, CompilationException {
         final String json = readResourceTextFile("ignore_false.json");
         final StateMachineCompiler compiler = StateMachineParser.parseAndListRequiredDeviceIds(json);
         assertNotNull(compiler);
@@ -115,7 +115,7 @@ public class StateMachineCompilerImplTest {
     }
 
     @Test
-    void ignoreEntryIsRespected() throws IOException, MalformedInputException, CompilationException {
+    void ignoreEntryIsRespected() throws IOException, ValidationException, CompilationException {
         final String json = readResourceTextFile("ignore_true.json");
         final StateMachineCompiler compiler = StateMachineParser.parseAndListRequiredDeviceIds(json);
         assertNotNull(compiler);
@@ -177,7 +177,7 @@ public class StateMachineCompilerImplTest {
         }
     }
 
-    private static class BadDeviceCommandCompiler implements  DeviceCommandCompiler {
+    private static class BadDeviceCommandCompiler implements DeviceCommandCompiler {
         @Override
         public DeviceCommand compile(String commandString) {
             throw new RuntimeException("Really bad exception");
