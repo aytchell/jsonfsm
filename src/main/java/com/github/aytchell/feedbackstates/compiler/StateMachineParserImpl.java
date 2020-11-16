@@ -15,10 +15,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class StateMachineParserImpl implements StateMachineParser {
+public class StateMachineParserImpl {
     private final ObjectMapper mapper = new ObjectMapper();
 
-    @Override
     public StateMachineCompiler parseAndListRequiredDeviceIds(String jsonDescription) throws MalformedInputException {
         if (jsonDescription == null || jsonDescription.isEmpty()) {
             throw new MalformedInputException("StateMachine description is empty");

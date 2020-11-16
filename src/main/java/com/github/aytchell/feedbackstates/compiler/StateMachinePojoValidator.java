@@ -11,7 +11,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class StateMachinePojoValidator {
+class StateMachinePojoValidator {
     private final StateMachinePojo stateMachinePojo;
     private final Set<String> knownStateNames = new HashSet<>();
     private final Set<String> knownTriggerNames = new HashSet<>();

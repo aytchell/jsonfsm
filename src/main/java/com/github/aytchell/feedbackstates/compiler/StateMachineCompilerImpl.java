@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class StateMachineCompilerImpl implements StateMachineCompiler {
+class StateMachineCompilerImpl implements StateMachineCompiler {
     @Getter
     private final Set<Integer> requiredDevices;
     @Getter

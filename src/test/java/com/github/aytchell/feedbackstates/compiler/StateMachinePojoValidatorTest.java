@@ -100,10 +100,8 @@ public class StateMachinePojoValidatorTest {
     }
 
     private String expectExceptionReturnMessage(String filename) {
-        final StateMachineParser parser = new StateMachineParserImpl();
-
         final Exception e = assertThrows(MalformedInputException.class,
-                () -> parser.parseAndListRequiredDeviceIds(readResourceTextFile(filename)));
+                () -> StateMachineParser.parseAndListRequiredDeviceIds(readResourceTextFile(filename)));
         return e.getMessage();
     }
 

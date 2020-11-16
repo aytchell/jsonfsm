@@ -5,7 +5,7 @@ import lombok.Getter;
 
 import java.util.Set;
 
-public class StateMachineImpl implements StateMachine {
+class StateMachineImpl implements StateMachine {
     private final com.github.oxo42.stateless4j.StateMachine<String, String> stateMachine;
     private final TriggerTranslator mapping;
     @Getter

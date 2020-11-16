@@ -25,8 +25,7 @@ public class StateMachineCompilerImplTest {
     @Test
     void commandOnExitAndEnter() throws IOException, MalformedInputException, CompilationException {
         final String json = readResourceTextFile("simple_exit_enter.json");
-        final StateMachineParser parser = new StateMachineParserImpl();
-        final StateMachineCompiler compiler = parser.parseAndListRequiredDeviceIds(json);
+        final StateMachineCompiler compiler = StateMachineParser.parseAndListRequiredDeviceIds(json);
         assertNotNull(compiler);
         assertNotNull(compiler.getRequiredDevices());
 
@@ -44,8 +43,7 @@ public class StateMachineCompilerImplTest {
     @Test
     void multipleDevicesAndCommands() throws IOException, MalformedInputException, CompilationException {
         final String json = readResourceTextFile("multiple_devices_and_cmds.json");
-        final StateMachineParser parser = new StateMachineParserImpl();
-        final StateMachineCompiler compiler = parser.parseAndListRequiredDeviceIds(json);
+        final StateMachineCompiler compiler = StateMachineParser.parseAndListRequiredDeviceIds(json);
         assertNotNull(compiler);
         assertNotNull(compiler.getRequiredDevices());
         assertEquals(Set.of(1,2,3,4), compiler.getRequiredDevices());
@@ -69,8 +67,7 @@ public class StateMachineCompilerImplTest {
     @Test
     void notEnoughDeviceCompilersGivenThrows() throws IOException, MalformedInputException {
         final String json = readResourceTextFile("multiple_devices_and_cmds.json");
-        final StateMachineParser parser = new StateMachineParserImpl();
-        final StateMachineCompiler compiler = parser.parseAndListRequiredDeviceIds(json);
+        final StateMachineCompiler compiler = StateMachineParser.parseAndListRequiredDeviceIds(json);
 
         final Map<Integer, DeviceCommandCompiler> compilers = new HashMap<>();
         compilers.put(1, new LogDeviceCommandCompiler("", new StringBuffer()));
@@ -83,8 +80,7 @@ public class StateMachineCompilerImplTest {
     @Test
     void exceptionFromDeviceCommandCompilerIsForwarded() throws IOException, MalformedInputException {
         final String json = readResourceTextFile("simple_exit_enter.json");
-        final StateMachineParser parser = new StateMachineParserImpl();
-        final StateMachineCompiler compiler = parser.parseAndListRequiredDeviceIds(json);
+        final StateMachineCompiler compiler = StateMachineParser.parseAndListRequiredDeviceIds(json);
         assertNotNull(compiler);
         assertNotNull(compiler.getRequiredDevices());
 
@@ -101,8 +97,7 @@ public class StateMachineCompilerImplTest {
     @Test
     void superfluousIgnoreIsIgnored() throws IOException, MalformedInputException, CompilationException {
         final String json = readResourceTextFile("ignore_false.json");
-        final StateMachineParser parser = new StateMachineParserImpl();
-        final StateMachineCompiler compiler = parser.parseAndListRequiredDeviceIds(json);
+        final StateMachineCompiler compiler = StateMachineParser.parseAndListRequiredDeviceIds(json);
         assertNotNull(compiler);
         assertNotNull(compiler.getRequiredDevices());
 
@@ -122,8 +117,7 @@ public class StateMachineCompilerImplTest {
     @Test
     void ignoreEntryIsRespected() throws IOException, MalformedInputException, CompilationException {
         final String json = readResourceTextFile("ignore_true.json");
-        final StateMachineParser parser = new StateMachineParserImpl();
-        final StateMachineCompiler compiler = parser.parseAndListRequiredDeviceIds(json);
+        final StateMachineCompiler compiler = StateMachineParser.parseAndListRequiredDeviceIds(json);
         assertNotNull(compiler);
         assertNotNull(compiler.getRequiredDevices());
 

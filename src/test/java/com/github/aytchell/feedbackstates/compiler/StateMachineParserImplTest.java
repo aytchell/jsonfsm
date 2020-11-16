@@ -9,9 +9,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class StateMachineParserImplTest {
     @Test
     void emptyInputGivenThrows() throws MalformedInputException {
-        final StateMachineParser parser = new StateMachineParserImpl();
-
-        assertThrows(MalformedInputException.class, () -> parser.parseAndListRequiredDeviceIds(null));
-        assertThrows(MalformedInputException.class, () -> parser.parseAndListRequiredDeviceIds(""));
+        assertThrows(MalformedInputException.class,
+                () -> StateMachineParser.parseAndListRequiredDeviceIds(null));
+        assertThrows(MalformedInputException.class,
+                () -> StateMachineParser.parseAndListRequiredDeviceIds(""));
     }
 }
