@@ -3,15 +3,15 @@ package com.github.aytchell.feedbackstates.compiler;
 import java.util.HashMap;
 import java.util.Map;
 
-class TriggerTranslator {
+class EventTranslator {
     private final Map<String, String> mapping = new HashMap<>();
 
-    public void addTrigger(int eventSourceId, String eventPayload, String triggerName) {
+    public void addEvent(int eventSourceId, String eventPayload, String eventName) {
         final String key = computeKey(eventSourceId, eventPayload);
-        mapping.put(key, triggerName);
+        mapping.put(key, eventName);
     }
 
-    public String getTriggerName(int eventSourceId, String eventPayload) {
+    public String getEventName(int eventSourceId, String eventPayload) {
         final String key = computeKey(eventSourceId, eventPayload);
         return mapping.get(key);
     }

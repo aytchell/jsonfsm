@@ -23,7 +23,7 @@ class StateMachineCompilerImpl implements StateMachineCompiler {
     @Getter
     private final Set<Integer> acceptedEventSources;
 
-    private final TriggerTranslator mapping;
+    private final EventTranslator mapping;
     private final StateMachinePojo stateMachinePojo;
     private final StateMachineConfig<String, String> config;
 
@@ -31,7 +31,7 @@ class StateMachineCompilerImpl implements StateMachineCompiler {
             StateMachinePojo stateMachinePojo) {
         this.requiredDevices = requiredDevices;
         this.acceptedEventSources = acceptedEventSources;
-        mapping = new TriggerTranslator();
+        mapping = new EventTranslator();
         this.stateMachinePojo = stateMachinePojo;
         this.config = new StateMachineConfig<>();
     }
@@ -64,7 +64,7 @@ class StateMachineCompilerImpl implements StateMachineCompiler {
 
     private void buildTriggers() {
         stateMachinePojo.getTriggers().forEach(
-                t -> mapping.addTrigger(t.getEventSourceId(), t.getEventPayload(), t.getName())
+                t -> mapping.addEvent(t.getEventSourceId(), t.getEventPayload(), t.getName())
         );
     }
 

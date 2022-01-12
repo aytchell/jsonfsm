@@ -36,7 +36,7 @@ public class StateMachineCompilerImplTest {
         StringBuffer buffer = new StringBuffer();
         final StateMachine stateMachine = compiler.compileStateMachine(
                 Map.of(10, new LogDeviceCommandCompiler("", buffer)));
-        stateMachine.inject(1, "move ya");
+        stateMachine.injectEvent(1, "move ya");
         assertEquals("Exiting 'Start' ...Entering 'Stop' ...", buffer.toString());
     }
 
@@ -60,7 +60,7 @@ public class StateMachineCompilerImplTest {
         assertEquals(Set.of(1, 2, 3, 4), stateMachine.getControlledDeviceIds());
         assertEquals(Set.of(1, 2), stateMachine.getHandledEventSourceIds());
 
-        stateMachine.inject(1, "move ya");
+        stateMachine.injectEvent(1, "move ya");
         assertEquals("1:Cmd1 2:Cmd2 3:Cmd3 4:Cmd4 ", buffer.toString());
     }
 
@@ -108,7 +108,7 @@ public class StateMachineCompilerImplTest {
         StringBuffer buffer = new StringBuffer();
         final StateMachine stateMachine = compiler.compileStateMachine(
                 Map.of(10, new LogDeviceCommandCompiler("", buffer)));
-        stateMachine.inject(1, "move ya");
+        stateMachine.injectEvent(1, "move ya");
 
         // Ensure that the transition is taken even though there is an 'ignored' entry
         assertEquals("Exit 'Start' Enter 'Stop'", buffer.toString());
@@ -128,7 +128,7 @@ public class StateMachineCompilerImplTest {
         StringBuffer buffer = new StringBuffer();
         final StateMachine stateMachine = compiler.compileStateMachine(
                 Map.of(10, new LogDeviceCommandCompiler("", buffer)));
-        stateMachine.inject(1, "move ya");
+        stateMachine.injectEvent(1, "move ya");
 
         // Ensure that the transition is NOT taken (the trigger should be accepted by the state machine but ignored)
         final String content = buffer.toString();
