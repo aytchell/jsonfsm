@@ -5,7 +5,7 @@ import com.github.aytchell.feedbackstates.DeviceCommandCompiler;
 import com.github.aytchell.feedbackstates.StateMachine;
 import com.github.aytchell.feedbackstates.StateMachineCompiler;
 import com.github.aytchell.feedbackstates.exceptions.CompilationException;
-import com.github.aytchell.feedbackstates.input.pojos.CommandPojo;
+import com.github.aytchell.feedbackstates.input.pojos.BehaviorPojo;
 import com.github.aytchell.feedbackstates.input.pojos.StateMachinePojo;
 import com.github.aytchell.feedbackstates.input.pojos.StatePojo;
 import com.github.aytchell.feedbackstates.input.pojos.TransitionPojo;
@@ -91,26 +91,26 @@ class StateMachineCompilerImpl implements StateMachineCompiler {
     }
 
     private void addEntryCommandsToState(StateConfiguration<String, String> state,
-            List<CommandPojo> entryCommands, Map<Integer, DeviceCommandCompiler> commandCompilers)
+                                         List<BehaviorPojo> entryCommands, Map<Integer, DeviceCommandCompiler> commandCompilers)
             throws CompilationException {
         if (entryCommands == null || entryCommands.isEmpty()) {
             return;
         }
 
-        for (CommandPojo cmd : entryCommands) {
+        for (BehaviorPojo cmd : entryCommands) {
             final DeviceCommand command = commandCompilers.get(cmd.getDeviceId()).compile(cmd.getCommandString());
             state.onEntry(command::execute);
         }
     }
 
     private void addExitCommandsToState(StateConfiguration<String, String> state,
-            List<CommandPojo> exitCommands, Map<Integer, DeviceCommandCompiler> commandCompilers)
+                                        List<BehaviorPojo> exitCommands, Map<Integer, DeviceCommandCompiler> commandCompilers)
             throws CompilationException {
         if (exitCommands == null || exitCommands.isEmpty()) {
             return;
         }
 
-        for (CommandPojo cmd : exitCommands) {
+        for (BehaviorPojo cmd : exitCommands) {
             final DeviceCommand command = commandCompilers.get(cmd.getDeviceId()).compile(cmd.getCommandString());
             state.onExit(command::execute);
         }

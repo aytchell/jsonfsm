@@ -7,7 +7,7 @@ import java.util.List;
 @Data
 public class StatePojo {
     private String name;
-    private List<CommandPojo> onEntry;
-    private List<CommandPojo> onExit;
+    private List<BehaviorPojo> onEntry;
+    private List<BehaviorPojo> onExit;
     private List<TransitionPojo> transitions;
 }

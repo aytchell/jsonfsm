@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.aytchell.feedbackstates.StateMachineCompiler;
-import com.github.aytchell.feedbackstates.input.pojos.CommandPojo;
+import com.github.aytchell.feedbackstates.input.pojos.BehaviorPojo;
 import com.github.aytchell.feedbackstates.input.pojos.StateMachinePojo;
 import com.github.aytchell.feedbackstates.input.pojos.StatePojo;
 import com.github.aytchell.validator.Validator;
@@ -60,20 +60,20 @@ public class StateMachineParserImpl {
     }
 
     private Set<Integer> extractRequiredEntryDeviceIds(StatePojo state) {
-        List<CommandPojo> entries = state.getOnEntry();
+        List<BehaviorPojo> entries = state.getOnEntry();
         if (entries == null || entries.isEmpty()) {
             return Set.of();
         }
 
-        return entries.stream().map(CommandPojo::getDeviceId).collect(Collectors.toSet());
+        return entries.stream().map(BehaviorPojo::getDeviceId).collect(Collectors.toSet());
     }
 
     private Set<Integer> extractRequiredExitDeviceIds(StatePojo state) {
-        List<CommandPojo> exits = state.getOnExit();
+        List<BehaviorPojo> exits = state.getOnExit();
         if (exits == null || exits.isEmpty()) {
             return Set.of();
         }
 
-        return exits.stream().map(CommandPojo::getDeviceId).collect(Collectors.toSet());
+        return exits.stream().map(BehaviorPojo::getDeviceId).collect(Collectors.toSet());
     }
 }

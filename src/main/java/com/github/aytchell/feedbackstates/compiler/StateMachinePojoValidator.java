@@ -1,6 +1,6 @@
 package com.github.aytchell.feedbackstates.compiler;
 
-import com.github.aytchell.feedbackstates.input.pojos.CommandPojo;
+import com.github.aytchell.feedbackstates.input.pojos.BehaviorPojo;
 import com.github.aytchell.feedbackstates.input.pojos.StateMachinePojo;
 import com.github.aytchell.feedbackstates.input.pojos.TransitionPojo;
 import com.github.aytchell.validator.Validator;
@@ -51,8 +51,8 @@ class StateMachinePojoValidator {
         Validator.expect(stateMachinePojo.getStates(), "states").notNull().notEmpty().eachCustomEntry(
                 state -> {
                     Validator.expect(state.getName(), "name").notNull().notBlank();
-                    expectCommandListIsCompleteIfGiven(state.getOnEntry(), "onEntry");
-                    expectCommandListIsCompleteIfGiven(state.getOnExit(), "onExit");
+                    expectBehaviorListIsCompleteIfGiven(state.getOnEntry(), "onEntry");
+                    expectBehaviorListIsCompleteIfGiven(state.getOnExit(), "onExit");
 
                     // For validating the transitions we need to have a list of all known state names
                     knownStateNames.add(state.getName());
@@ -89,8 +89,8 @@ class StateMachinePojoValidator {
                 .notNull().isTrue();
     }
 
-    private void expectCommandListIsCompleteIfGiven(List<CommandPojo> commands, String name) throws ValidationException {
-        Validator.expect(commands, name).ifNotNull().eachCustomEntry(
+    private void expectBehaviorListIsCompleteIfGiven(List<BehaviorPojo> behaviors, String name) throws ValidationException {
+        Validator.expect(behaviors, name).ifNotNull().eachCustomEntry(
                 cmd -> {
                     Validator.expect(cmd.getDeviceId(), "deviceId").notNull().greaterThan(0);
                     Validator.expect(cmd.getCommandString(), "commandString").notNull().notBlank();
