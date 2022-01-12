@@ -68,6 +68,12 @@ public class StateMachinePojoValidatorTest {
     }
 
     @Test
+    void incompleteEffectsWillThrow() {
+        parseFileAssertThrowsAndMessageReadsLike("effect_incomplete.json",
+                List.of("'states[0].transitions[0].effects[0].deviceId", "is not null"));
+    }
+
+    @Test
     void incompleteTransitionWillThrow() {
         parseFileAssertThrowsAndMessageReadsLike("transition_incomplete.json",
                 List.of("'states[0].transitions[0].targetState'", "alternatively add", "ignore", "is not null"));

@@ -1,0 +1,29 @@
+{
+  "initialState" : "Start",
+  "triggers" : [
+      {
+          "name" : "move",
+          "eventSourceId" : 1,
+          "eventPayload" : "move ya"
+      }
+  ],
+  "states" : [
+    {
+      "name" : "Start",
+      "transitions" : [{
+          "triggerName" : "move",
+          "targetState" : "Stop",
+          "effects" : [{
+              "commandString" : "Traversing 'move' ..."
+          }]
+      }]
+    },
+    {
+      "name" : "Stop",
+      "onEntry" : [{
+        "deviceId" : 10,
+        "commandString" : "Entering 'Stop' ..."
+      }]
+    }
+  ]
+}

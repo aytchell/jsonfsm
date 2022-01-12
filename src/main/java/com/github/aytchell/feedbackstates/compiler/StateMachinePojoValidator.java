@@ -83,18 +83,21 @@ class StateMachinePojoValidator {
         Validator.expect(transition.getTargetState(), "targetState").ifNotGivenOrFalse(transition.getIgnore())
                 // no extraInfo if the name is malformed
                 .notNull().notBlank().passes(knownStateNames::contains, "is contained in states");
+        Validator.expect(transition.getEffects(), "effects").ifNotGivenOrFalse(transition.getIgnore())
+                        .ifNotNull().eachCustomEntry(this::expectBehaviorIsComplete);
         Validator.expect(transition.getIgnore(), "ignore")
                 .ifTrue(transition.getTargetState() == null)
                 // no 'targetState' given so there has to be 'ignore' and it must be 'true'
                 .notNull().isTrue();
     }
 
-    private void expectBehaviorListIsCompleteIfGiven(List<BehaviorPojo> behaviors, String name) throws ValidationException {
-        Validator.expect(behaviors, name).ifNotNull().eachCustomEntry(
-                cmd -> {
-                    Validator.expect(cmd.getDeviceId(), "deviceId").notNull().greaterThan(0);
-                    Validator.expect(cmd.getCommandString(), "commandString").notNull().notBlank();
-                }
-        );
+    private void expectBehaviorListIsCompleteIfGiven(List<BehaviorPojo> behaviors, String name)
+            throws ValidationException {
+        Validator.expect(behaviors, name).ifNotNull().eachCustomEntry(this::expectBehaviorIsComplete);
+    }
+
+    private void expectBehaviorIsComplete(BehaviorPojo behavior) throws ValidationException {
+        Validator.expect(behavior.getDeviceId(), "deviceId").notNull().greaterThan(0);
+        Validator.expect(behavior.getCommandString(), "commandString").notNull().notBlank();
     }
 }
