@@ -1,6 +1,4 @@
 {
-  "options" : {
-  },
   "triggers" : [
       {
           "name" : "move",

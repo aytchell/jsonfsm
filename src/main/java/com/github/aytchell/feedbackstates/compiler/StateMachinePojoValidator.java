@@ -2,7 +2,6 @@ package com.github.aytchell.feedbackstates.compiler;
 
 import com.github.aytchell.feedbackstates.input.pojos.CommandPojo;
 import com.github.aytchell.feedbackstates.input.pojos.StateMachinePojo;
-import com.github.aytchell.feedbackstates.input.pojos.StatePojo;
 import com.github.aytchell.feedbackstates.input.pojos.TransitionPojo;
 import com.github.aytchell.validator.Validator;
 import com.github.aytchell.validator.exceptions.ValidationException;
@@ -31,9 +30,9 @@ class StateMachinePojoValidator {
         // during 'validateTriggers' so we need to run it in that order.
         validateStates();
 
-        // we're checking if options.initialState is a known state; so this check
+        // we're checking if initialState is a known state; so this check
         // must be done *after* we validated the structure of 'states'
-        validateOptions();
+        validateInitialState();
     }
 
     private void validateTriggers() throws ValidationException {
@@ -68,12 +67,10 @@ class StateMachinePojoValidator {
                 });
     }
 
-    private void validateOptions() throws ValidationException {
-        Validator.expect(stateMachinePojo.getOptions(), "options").notNull().passes(
-                options -> {
-                    Validator.expect(options.getInitialState(), "initialState").notNull().notBlank()
-                            .passes(knownStateNames::contains, "is contained in states");
-                });
+    private void validateInitialState() throws ValidationException {
+        Validator.expect(stateMachinePojo.getInitialState(), "initialState")
+                .notNull().notBlank()
+                .passes(knownStateNames::contains, "is contained in states");
     }
 
     private void validateTransition(TransitionPojo transition) throws ValidationException {

@@ -8,21 +8,15 @@ import static com.github.aytchell.feedbackstates.compiler.ExceptionMessageChecks
 
 public class StateMachinePojoValidatorTest {
     @Test
-    void missingOptionsWillThrow() {
-        parseFileAssertThrowsAndMessageReadsLike("options_missing.json",
-                List.of("'options'", "is not null"));
-    }
-
-    @Test
     void missingInitialStateWillThrow() {
         parseFileAssertThrowsAndMessageReadsLike("initial_state_missing.json",
-                List.of("'options.initialState'", "is not null"));
+                List.of("'initialState'", "is not null"));
     }
 
     @Test
     void initialStateDenotesUnkownState() {
         parseFileAssertThrowsAndMessageReadsLike("unknown_initial_state.json",
-                List.of("'options.initialState'", "value: 'Starting'", "contained in states"));
+                List.of("'initialState'", "value: 'Starting'", "contained in states"));
     }
 
     @Test

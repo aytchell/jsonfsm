@@ -6,7 +6,7 @@ import java.util.List;
 
 @Data
 public class StateMachinePojo {
-    private OptionsPojo options;
+    private String initialState;
     private List<TriggerPojo> triggers;
     private List<StatePojo> states;
 }

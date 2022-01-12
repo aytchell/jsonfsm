@@ -59,7 +59,7 @@ class StateMachineCompilerImpl implements StateMachineCompiler {
     }
 
     private String findInitialState(StateMachinePojo stateMachinePojo) {
-        return stateMachinePojo.getOptions().getInitialState();
+        return stateMachinePojo.getInitialState();
     }
 
     private void buildTriggers() {

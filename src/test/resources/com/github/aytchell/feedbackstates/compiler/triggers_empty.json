@@ -1,7 +1,5 @@
 {
-  "options" : {
-    "initialState" : "Start"
-  },
+  "initialState" : "Start",
   "triggers" : [
   ],
   "states" : [
