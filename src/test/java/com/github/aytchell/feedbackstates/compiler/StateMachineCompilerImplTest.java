@@ -41,6 +41,24 @@ public class StateMachineCompilerImplTest {
     }
 
     @Test
+    void commandOnTransition() throws IOException, ValidationException, CompilationException {
+        final String json = readResourceTextFile("effect_on_transition.json");
+        final StateMachineCompiler compiler = StateMachineParser.parseAndListRequiredDeviceIds(json);
+        assertNotNull(compiler);
+        assertNotNull(compiler.getRequiredDevices());
+
+        final Set<Integer> devices = compiler.getRequiredDevices();
+        assertEquals(1, devices.size());
+        assertTrue(devices.contains(10));
+
+        StringBuffer buffer = new StringBuffer();
+        final StateMachine stateMachine = compiler.compileStateMachine(
+                Map.of(10, new LogDeviceCommandCompiler("", buffer)));
+        stateMachine.injectEvent(1, "move ya");
+        assertEquals("Moving to 'Stop' ...", buffer.toString());
+    }
+
+    @Test
     void multipleDevicesAndCommands() throws IOException, ValidationException, CompilationException {
         final String json = readResourceTextFile("multiple_devices_and_cmds.json");
         final StateMachineCompiler compiler = StateMachineParser.parseAndListRequiredDeviceIds(json);

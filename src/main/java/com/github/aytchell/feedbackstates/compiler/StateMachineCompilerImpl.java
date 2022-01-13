@@ -16,6 +16,7 @@ import lombok.Getter;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 
 class StateMachineCompilerImpl implements StateMachineCompiler {
     @Getter
@@ -87,7 +88,7 @@ class StateMachineCompilerImpl implements StateMachineCompiler {
         StateConfiguration<String, String> state = config.configure(name);
         addEntryCommandsToState(state, statePojo.getOnEntry(), commandCompilers);
         addExitCommandsToState(state, statePojo.getOnExit(), commandCompilers);
-        addTransitions(state, statePojo.getTransitions());
+        addTransitions(state, statePojo.getTransitions(), commandCompilers);
     }
 
     private void addEntryCommandsToState(StateConfiguration<String, String> state,
@@ -116,7 +117,9 @@ class StateMachineCompilerImpl implements StateMachineCompiler {
         }
     }
 
-    private void addTransitions(StateConfiguration<String, String> state, List<TransitionPojo> transitions) {
+    private void addTransitions(StateConfiguration<String, String> state,
+                                List<TransitionPojo> transitions,
+                                Map<Integer, DeviceCommandCompiler> commandCompilers) throws CompilationException {
         if (transitions == null) {
             return;
         }
@@ -124,7 +127,15 @@ class StateMachineCompilerImpl implements StateMachineCompiler {
         for (TransitionPojo t : transitions) {
             final Boolean ignore = t.getIgnore();
             if (ignore == null || !ignore) {
-                state.permit(t.getTriggerName(), t.getTargetState());
+                List<BehaviorPojo> effects = t.getEffects();
+                if (effects.isEmpty()) {
+                    state.permit(t.getTriggerName(), t.getTargetState());
+                } else {
+                    final DeviceCommand command =
+                            commandCompilers.get(effects.get(0).getDeviceId())
+                                    .compile(effects.get(0).getCommandString());
+                    state.permit(t.getTriggerName(), t.getTargetState(), command::execute);
+                }
             } else {
                 state.ignore(t.getTriggerName());
             }

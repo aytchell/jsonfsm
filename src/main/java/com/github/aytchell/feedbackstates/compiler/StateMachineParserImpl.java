@@ -7,13 +7,16 @@ import com.github.aytchell.feedbackstates.StateMachineCompiler;
 import com.github.aytchell.feedbackstates.input.pojos.BehaviorPojo;
 import com.github.aytchell.feedbackstates.input.pojos.StateMachinePojo;
 import com.github.aytchell.feedbackstates.input.pojos.StatePojo;
+import com.github.aytchell.feedbackstates.input.pojos.TransitionPojo;
 import com.github.aytchell.validator.Validator;
 import com.github.aytchell.validator.exceptions.ValidationException;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class StateMachineParserImpl {
     private final ObjectMapper mapper = new ObjectMapper();
@@ -56,6 +59,7 @@ public class StateMachineParserImpl {
         final Set<Integer> ids = new HashSet<>();
         ids.addAll(extractRequiredEntryDeviceIds(state));
         ids.addAll(extractRequiredExitDeviceIds(state));
+        ids.addAll(extractRequiredTransitionDeviceIds(state));
         return ids;
     }
 
@@ -75,5 +79,25 @@ public class StateMachineParserImpl {
         }
 
         return exits.stream().map(BehaviorPojo::getDeviceId).collect(Collectors.toSet());
+    }
+
+    private Collection<Integer> extractRequiredTransitionDeviceIds(StatePojo state) {
+        final List<TransitionPojo> transitions = state.getTransitions();
+        if (transitions == null || transitions.isEmpty()) {
+            return Set.of();
+        }
+
+        return transitions.stream()
+                .flatMap(this::extractEffectsAsStream)
+                .map(BehaviorPojo::getDeviceId).collect(Collectors.toSet());
+    }
+
+    private Stream<BehaviorPojo> extractEffectsAsStream(TransitionPojo transition) {
+        final List<BehaviorPojo> effects = transition.getEffects();
+        if (effects == null || effects.isEmpty()) {
+            return Stream.of();
+        }
+
+        return effects.stream();
     }
 }
