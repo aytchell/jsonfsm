@@ -18,4 +18,12 @@ class StateMachineParserImplTest {
                 () -> StateMachineParser.parseAndListRequiredDeviceIds(""),
                 List.of("'jsonStateMachine'", "is not blank"));
     }
+
+    @Test
+    void brokenJsonAsInputFailsProperly() {
+        assertThrowsAndMessageReadsLike(
+                () -> StateMachineParser.parseAndListRequiredDeviceIds(
+                        "{ \"initialState\" }"),
+                List.of("Error while parsing", "Unexpected character"));
+    }
 }
