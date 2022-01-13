@@ -25,12 +25,14 @@ class StateMachineImpl implements StateMachine {
     }
 
     @Override
-    public void injectEvent(int eventSourceId, String eventPayload) {
+    public boolean injectEvent(int eventSourceId, String eventPayload) {
         final String eventName = mapping.getEventName(eventSourceId, eventPayload);
         if (eventName == null) {
             throw new IllegalArgumentException("Payload '" + eventPayload + "' from event source " +
                                                eventSourceId + " not known by state machine");
         }
         stateMachine.fire(eventName);
+
+        return false;
     }
 }
