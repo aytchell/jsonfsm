@@ -1,0 +1,27 @@
+{
+  "initialState" : "One",
+  "triggers" : [
+      {
+          "name" : "move",
+          "eventSourceId" : 1,
+          "eventPayload" : "move ya"
+      }
+  ],
+  "states" : [
+    {
+      "name" : "One",
+      "transitions" : [{
+          "triggerName" : "move",
+          "targetState" : "Two"
+      }]
+    },
+    {
+      "name" : "Two",
+      "transitions" : [{
+          "triggerName" : "move",
+          "targetState" : "One"
+      }]
+    }
+  ],
+  "finalStates" : [ "Three", "One" ]
+}

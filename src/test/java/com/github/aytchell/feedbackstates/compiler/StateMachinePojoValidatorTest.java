@@ -90,4 +90,10 @@ public class StateMachinePojoValidatorTest {
         parseFileAssertThrowsAndMessageReadsLike("unknown_target_state.json",
                 List.of("'states[0].transitions[0].targetState'", "'Stopped'", "is contained in states"));
     }
+
+    @Test
+    void unknownFinalStateWillThrow() {
+        parseFileAssertThrowsAndMessageReadsLike("unknown_final_state.json",
+                List.of("'finalStates[0]", "'Three'", "is contained in states"));
+    }
 }

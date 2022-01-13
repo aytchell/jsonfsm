@@ -30,9 +30,10 @@ class StateMachinePojoValidator {
         // during 'validateTriggers' so we need to run it in that order.
         validateStates();
 
-        // we're checking if initialState is a known state; so this check
-        // must be done *after* we validated the structure of 'states'
+        // we're checking if initialState and finalStates are known states; so these
+        // checks must be done *after* we validated the structure of 'states'
         validateInitialState();
+        validateFinalStates();
     }
 
     private void validateTriggers() throws ValidationException {
@@ -71,6 +72,15 @@ class StateMachinePojoValidator {
         Validator.expect(stateMachinePojo.getInitialState(), "initialState")
                 .notNull().notBlank()
                 .passes(knownStateNames::contains, "is contained in states");
+    }
+
+    private void validateFinalStates() throws ValidationException {
+        Validator.expect(stateMachinePojo.getFinalStates(), "finalStates")
+                .ifNotNull()
+                .eachCustomEntry(
+                        state -> Validator.expect(state)
+                                .notNull().notBlank().passes(knownStateNames::contains, "is contained in states")
+                );
     }
 
     private void validateTransition(TransitionPojo transition) throws ValidationException {
