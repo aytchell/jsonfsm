@@ -16,10 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class StateMachineCompilerImplTest {
     @Test
@@ -171,6 +168,31 @@ public class StateMachineCompilerImplTest {
         // Ensure that the transition is NOT taken (the trigger should be accepted by the state machine but ignored)
         final String content = buffer.toString();
         assertTrue(content.isEmpty(), String.format("Buffer should be empty but is '%s'", content));
+    }
+
+    @Test
+    void returnValueReflectsFinalStates() throws IOException, ValidationException, CompilationException {
+        final String json = readResourceTextFile("final_states.json");
+        final StateMachineCompiler compiler = StateMachineParser.parseAndListRequiredDeviceIds(json);
+        assertNotNull(compiler);
+        assertNotNull(compiler.getRequiredDevices());
+
+        final Set<Integer> devices = compiler.getRequiredDevices();
+        assertTrue(devices.isEmpty());
+
+        final StateMachine stateMachine = compiler.compileStateMachine(Map.of());
+        // transition "One" --> "Two"
+        final boolean isStateTwoFinal = stateMachine.injectEvent(1, "move ya");
+        assertFalse(isStateTwoFinal);
+        // transition "Two" --> "Three"
+        final boolean isStateThreeFinal = stateMachine.injectEvent(1, "move ya");
+        assertTrue(isStateThreeFinal);
+        // transition "Three" --> "One"
+        final boolean isStateOneFinal = stateMachine.injectEvent(1, "move ya");
+        assertTrue(isStateOneFinal);
+        // transition "One" --> "Two"
+        final boolean isStateTwoNowFinal = stateMachine.injectEvent(1, "move ya");
+        assertFalse(isStateTwoNowFinal);
     }
 
     private String readResourceTextFile(String filename) throws IOException {
