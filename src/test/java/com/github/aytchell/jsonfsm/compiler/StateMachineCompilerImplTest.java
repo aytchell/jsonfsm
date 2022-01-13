@@ -5,17 +5,16 @@ import com.github.aytchell.jsonfsm.DeviceCommandCompiler;
 import com.github.aytchell.jsonfsm.StateMachine;
 import com.github.aytchell.jsonfsm.StateMachineCompiler;
 import com.github.aytchell.jsonfsm.StateMachineParser;
-import com.github.aytchell.jsonfsm.exceptions.CompilationException;
+import com.github.aytchell.jsonfsm.CompilationException;
 import com.github.aytchell.validator.exceptions.ValidationException;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import static com.github.aytchell.jsonfsm.compiler.ExceptionMessageChecks.readResourceTextFile;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class StateMachineCompilerImplTest {
@@ -192,17 +191,6 @@ public class StateMachineCompilerImplTest {
         // transition "One" --> "Two"
         final boolean isStateTwoNowFinal = stateMachine.injectEvent(1, "move ya");
         assertFalse(isStateTwoNowFinal);
-    }
-
-    private String readResourceTextFile(String filename) throws IOException {
-        try (
-                final InputStream input = this.getClass().getResourceAsStream(filename)
-        ) {
-            assertNotNull(input);
-            byte[] content = input.readAllBytes();
-            assertNotNull(content);
-            return new String(content, StandardCharsets.UTF_8);
-        }
     }
 
     private static class LogDeviceCommand implements DeviceCommand {

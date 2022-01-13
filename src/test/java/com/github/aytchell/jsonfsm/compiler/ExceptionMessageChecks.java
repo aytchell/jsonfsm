@@ -15,7 +15,7 @@ public class ExceptionMessageChecks {
     public static void parseFileAssertThrowsAndMessageReadsLike(String filename, List<String> substrings) {
         final ValidationException e = assertThrows(ValidationException.class,
                 () -> StateMachineParser.parseAndListRequiredDeviceIds(readResourceTextFile(filename)));
-        messageReadsLike(e, substrings);
+        assertMessageReadsLike(e, substrings);
     }
 
     public static void assertThrowsAndMessageReadsLike(Executable executable, String substring) {
@@ -23,14 +23,18 @@ public class ExceptionMessageChecks {
     }
 
     public static void assertThrowsAndMessageReadsLike(Executable executable, List<String> substringList) {
-        messageReadsLike(
+        assertMessageReadsLike(
                 assertThrows(ValidationException.class, executable),
                 substringList
         );
     }
 
-    private static void messageReadsLike(ValidationException e, List<String> substringList) {
+    private static void assertMessageReadsLike(ValidationException e, List<String> substringList) {
         final String message = e.getMessage();
+        assertMessageReadsLike(message, substringList);
+    }
+
+    public static void assertMessageReadsLike(String message, List<String> substringList) {
         final IndexKeeper startIndex = new IndexKeeper();
 
         substringList.forEach(
@@ -49,7 +53,7 @@ public class ExceptionMessageChecks {
         );
     }
 
-    private static String readResourceTextFile(String filename) throws IOException {
+    static String readResourceTextFile(String filename) throws IOException {
         try (
                 final InputStream input = ExceptionMessageChecks.class.getResourceAsStream(filename)
         ) {
