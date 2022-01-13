@@ -13,10 +13,10 @@ import com.github.oxo42.stateless4j.StateConfiguration;
 import com.github.oxo42.stateless4j.StateMachineConfig;
 import lombok.Getter;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Function;
 
 class StateMachineCompilerImpl implements StateMachineCompiler {
     @Getter
@@ -128,17 +128,25 @@ class StateMachineCompilerImpl implements StateMachineCompiler {
             final Boolean ignore = t.getIgnore();
             if (ignore == null || !ignore) {
                 List<BehaviorPojo> effects = t.getEffects();
-                if (effects.isEmpty()) {
+                if (effects == null || effects.isEmpty()) {
                     state.permit(t.getTriggerName(), t.getTargetState());
                 } else {
-                    final DeviceCommand command =
-                            commandCompilers.get(effects.get(0).getDeviceId())
-                                    .compile(effects.get(0).getCommandString());
+                    final DeviceCommand command = compileDeviceCommandChain(effects, commandCompilers);
                     state.permit(t.getTriggerName(), t.getTargetState(), command::execute);
                 }
             } else {
                 state.ignore(t.getTriggerName());
             }
         }
+    }
+
+    private DeviceCommand compileDeviceCommandChain(
+            List<BehaviorPojo> effects,
+            Map<Integer,DeviceCommandCompiler> commandCompilers) throws CompilationException {
+        final List<DeviceCommand> commands = new LinkedList<>();
+        for (BehaviorPojo e : effects) {
+            commands.add(commandCompilers.get(e.getDeviceId()).compile(e.getCommandString()));
+        }
+        return () -> { commands.forEach(DeviceCommand::execute); };
     }
 }

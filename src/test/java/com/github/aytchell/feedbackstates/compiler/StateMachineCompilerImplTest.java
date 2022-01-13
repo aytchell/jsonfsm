@@ -83,6 +83,26 @@ public class StateMachineCompilerImplTest {
     }
 
     @Test
+    void multipleEffectsOnTransition() throws IOException, ValidationException, CompilationException {
+        final String json = readResourceTextFile("multiple_effects.json");
+        final StateMachineCompiler compiler = StateMachineParser.parseAndListRequiredDeviceIds(json);
+        assertNotNull(compiler);
+        assertNotNull(compiler.getRequiredDevices());
+        assertEquals(Set.of(10), compiler.getRequiredDevices());
+        assertEquals(Set.of(1), compiler.getAcceptedEventSources());
+
+        StringBuffer buffer = new StringBuffer();
+
+        final StateMachine stateMachine = compiler.compileStateMachine(
+                Map.of(10, new LogDeviceCommandCompiler("", buffer)));
+        assertEquals(Set.of(10), stateMachine.getControlledDeviceIds());
+        assertEquals(Set.of(1), stateMachine.getHandledEventSourceIds());
+
+        stateMachine.injectEvent(1, "move ya");
+        assertEquals("Moving to 'Stop' ...Still moving ...", buffer.toString());
+    }
+
+    @Test
     void notEnoughDeviceCompilersGivenThrows() throws IOException, ValidationException {
         final String json = readResourceTextFile("multiple_devices_and_cmds.json");
         final StateMachineCompiler compiler = StateMachineParser.parseAndListRequiredDeviceIds(json);
@@ -157,6 +177,7 @@ public class StateMachineCompilerImplTest {
         try (
                 final InputStream input = this.getClass().getResourceAsStream(filename);
         ) {
+            assertNotNull(input);
             byte[] content = input.readAllBytes();
             return new String(content, StandardCharsets.UTF_8);
         }
