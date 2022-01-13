@@ -123,7 +123,6 @@ public class StateMachineCompilerImplTest {
         assertEquals(1, devices.size());
         assertTrue(devices.contains(10));
 
-        StringBuffer buffer = new StringBuffer();
         assertThrows(CompilationException.class, () -> compiler.compileStateMachine(
                 Map.of(10, new BadDeviceCommandCompiler())
         ));
@@ -197,10 +196,11 @@ public class StateMachineCompilerImplTest {
 
     private String readResourceTextFile(String filename) throws IOException {
         try (
-                final InputStream input = this.getClass().getResourceAsStream(filename);
+                final InputStream input = this.getClass().getResourceAsStream(filename)
         ) {
             assertNotNull(input);
             byte[] content = input.readAllBytes();
+            assertNotNull(content);
             return new String(content, StandardCharsets.UTF_8);
         }
     }

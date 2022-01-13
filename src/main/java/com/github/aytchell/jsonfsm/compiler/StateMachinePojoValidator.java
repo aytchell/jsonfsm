@@ -62,10 +62,8 @@ class StateMachinePojoValidator {
         // the validation step above compiles a list of known states. When validating the transitions we need to have
         // a complete list of known states that's why we need a separate loop over all the states
         Validator.expect(stateMachinePojo.getStates(), "states").notNull().notEmpty().eachCustomEntry(
-                state -> {
-                    Validator.expect(state.getTransitions(), "transitions").ifNotNull()
-                            .eachCustomEntry(this::validateTransition);
-                });
+                state -> Validator.expect(state.getTransitions(), "transitions").ifNotNull()
+                        .eachCustomEntry(this::validateTransition));
     }
 
     private void validateInitialState() throws ValidationException {
@@ -88,7 +86,7 @@ class StateMachinePojoValidator {
                 .passes(knownTriggerNames::contains, "is a known triggerName");
         Validator.expect(transition.getTargetState(), "targetState",
                 "alternatively add 'transition.ignore = true'").ifNotGivenOrFalse(transition.getIgnore())
-                // if 'ignore' is given and 'true' we skip the test. Otherwise continue with the check
+                // if 'ignore' is given and 'true' we skip the test. Otherwise, continue with the check
                 .notNull();
         Validator.expect(transition.getTargetState(), "targetState").ifNotGivenOrFalse(transition.getIgnore())
                 // no extraInfo if the name is malformed

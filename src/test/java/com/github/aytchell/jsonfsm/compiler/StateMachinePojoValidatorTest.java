@@ -14,7 +14,7 @@ public class StateMachinePojoValidatorTest {
     }
 
     @Test
-    void initialStateDenotesUnkownState() {
+    void initialStateDenotesUnknownState() {
         parseFileAssertThrowsAndMessageReadsLike("unknown_initial_state.json",
                 List.of("'initialState'", "value: 'Starting'", "contained in states"));
     }

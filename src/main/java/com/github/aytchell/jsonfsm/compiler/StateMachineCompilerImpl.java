@@ -153,6 +153,6 @@ class StateMachineCompilerImpl implements StateMachineCompiler {
         for (BehaviorPojo e : effects) {
             commands.add(commandCompilers.get(e.getDeviceId()).compile(e.getCommandString()));
         }
-        return () -> { commands.forEach(DeviceCommand::execute); };
+        return () -> commands.forEach(DeviceCommand::execute);
     }
 }

@@ -9,8 +9,7 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ExceptionMessageChecks {
     public static void parseFileAssertThrowsAndMessageReadsLike(String filename, List<String> substrings) {
@@ -52,9 +51,11 @@ public class ExceptionMessageChecks {
 
     private static String readResourceTextFile(String filename) throws IOException {
         try (
-                final InputStream input = ExceptionMessageChecks.class.getResourceAsStream(filename);
+                final InputStream input = ExceptionMessageChecks.class.getResourceAsStream(filename)
         ) {
+            assertNotNull(input);
             byte[] content = input.readAllBytes();
+            assertNotNull(content);
             return new String(content, StandardCharsets.UTF_8);
         }
     }
