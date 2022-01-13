@@ -1,6 +1,6 @@
-package com.github.aytchell.feedbackstates.compiler;
+package com.github.aytchell.jsonfsm.compiler;
 
-import com.github.aytchell.feedbackstates.StateMachineParser;
+import com.github.aytchell.jsonfsm.StateMachineParser;
 import com.github.aytchell.validator.exceptions.ValidationException;
 import org.junit.jupiter.api.function.Executable;
 

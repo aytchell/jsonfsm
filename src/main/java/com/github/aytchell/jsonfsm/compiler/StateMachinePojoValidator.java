@@ -1,8 +1,8 @@
-package com.github.aytchell.feedbackstates.compiler;
+package com.github.aytchell.jsonfsm.compiler;
 
-import com.github.aytchell.feedbackstates.input.pojos.BehaviorPojo;
-import com.github.aytchell.feedbackstates.input.pojos.StateMachinePojo;
-import com.github.aytchell.feedbackstates.input.pojos.TransitionPojo;
+import com.github.aytchell.jsonfsm.input.pojos.BehaviorPojo;
+import com.github.aytchell.jsonfsm.input.pojos.StateMachinePojo;
+import com.github.aytchell.jsonfsm.input.pojos.TransitionPojo;
 import com.github.aytchell.validator.Validator;
 import com.github.aytchell.validator.exceptions.ValidationException;
 

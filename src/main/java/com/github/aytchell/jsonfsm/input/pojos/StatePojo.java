@@ -1,4 +1,4 @@
-package com.github.aytchell.feedbackstates.input.pojos;
+package com.github.aytchell.jsonfsm.input.pojos;
 
 import lombok.Data;
 

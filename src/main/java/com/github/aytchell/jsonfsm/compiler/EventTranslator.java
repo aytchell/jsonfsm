@@ -1,4 +1,4 @@
-package com.github.aytchell.feedbackstates.compiler;
+package com.github.aytchell.jsonfsm.compiler;
 
 import java.util.HashMap;
 import java.util.Map;

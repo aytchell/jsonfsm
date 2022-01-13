@@ -1,6 +1,6 @@
-package com.github.aytchell.feedbackstates.compiler;
+package com.github.aytchell.jsonfsm.compiler;
 
-import com.github.aytchell.feedbackstates.StateMachine;
+import com.github.aytchell.jsonfsm.StateMachine;
 import lombok.Getter;
 
 import java.util.Set;

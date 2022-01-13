@@ -1,6 +1,6 @@
-package com.github.aytchell.feedbackstates;
+package com.github.aytchell.jsonfsm;
 
-import com.github.aytchell.feedbackstates.compiler.StateMachineParserImpl;
+import com.github.aytchell.jsonfsm.compiler.StateMachineParserImpl;
 import com.github.aytchell.validator.exceptions.ValidationException;
 
 public class StateMachineParser {

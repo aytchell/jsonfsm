@@ -1,14 +1,14 @@
-package com.github.aytchell.feedbackstates.compiler;
+package com.github.aytchell.jsonfsm.compiler;
 
-import com.github.aytchell.feedbackstates.DeviceCommand;
-import com.github.aytchell.feedbackstates.DeviceCommandCompiler;
-import com.github.aytchell.feedbackstates.StateMachine;
-import com.github.aytchell.feedbackstates.StateMachineCompiler;
-import com.github.aytchell.feedbackstates.exceptions.CompilationException;
-import com.github.aytchell.feedbackstates.input.pojos.BehaviorPojo;
-import com.github.aytchell.feedbackstates.input.pojos.StateMachinePojo;
-import com.github.aytchell.feedbackstates.input.pojos.StatePojo;
-import com.github.aytchell.feedbackstates.input.pojos.TransitionPojo;
+import com.github.aytchell.jsonfsm.DeviceCommand;
+import com.github.aytchell.jsonfsm.DeviceCommandCompiler;
+import com.github.aytchell.jsonfsm.StateMachine;
+import com.github.aytchell.jsonfsm.StateMachineCompiler;
+import com.github.aytchell.jsonfsm.exceptions.CompilationException;
+import com.github.aytchell.jsonfsm.input.pojos.BehaviorPojo;
+import com.github.aytchell.jsonfsm.input.pojos.StateMachinePojo;
+import com.github.aytchell.jsonfsm.input.pojos.StatePojo;
+import com.github.aytchell.jsonfsm.input.pojos.TransitionPojo;
 import com.github.oxo42.stateless4j.StateConfiguration;
 import com.github.oxo42.stateless4j.StateMachineConfig;
 import lombok.Getter;

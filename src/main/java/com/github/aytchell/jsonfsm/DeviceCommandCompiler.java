@@ -1,6 +1,6 @@
-package com.github.aytchell.feedbackstates;
+package com.github.aytchell.jsonfsm;
 
-import com.github.aytchell.feedbackstates.exceptions.CompilationException;
+import com.github.aytchell.jsonfsm.exceptions.CompilationException;
 
 public interface DeviceCommandCompiler {
     DeviceCommand compile(String commandString) throws CompilationException;

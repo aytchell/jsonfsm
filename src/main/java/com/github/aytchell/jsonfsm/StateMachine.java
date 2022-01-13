@@ -1,4 +1,4 @@
-package com.github.aytchell.feedbackstates;
+package com.github.aytchell.jsonfsm;
 
 import java.util.Set;
 

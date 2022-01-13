@@ -1,10 +1,10 @@
-package com.github.aytchell.feedbackstates.compiler;
+package com.github.aytchell.jsonfsm.compiler;
 
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static com.github.aytchell.feedbackstates.compiler.ExceptionMessageChecks.parseFileAssertThrowsAndMessageReadsLike;
+import static com.github.aytchell.jsonfsm.compiler.ExceptionMessageChecks.parseFileAssertThrowsAndMessageReadsLike;
 
 public class StateMachinePojoValidatorTest {
     @Test

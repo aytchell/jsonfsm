@@ -1,4 +1,4 @@
-package com.github.aytchell.feedbackstates.exceptions;
+package com.github.aytchell.jsonfsm.exceptions;
 
 public class CompilationException extends Exception {
     public CompilationException(String message) {

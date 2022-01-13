@@ -1,13 +1,13 @@
-package com.github.aytchell.feedbackstates.compiler;
+package com.github.aytchell.jsonfsm.compiler;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.aytchell.feedbackstates.StateMachineCompiler;
-import com.github.aytchell.feedbackstates.input.pojos.BehaviorPojo;
-import com.github.aytchell.feedbackstates.input.pojos.StateMachinePojo;
-import com.github.aytchell.feedbackstates.input.pojos.StatePojo;
-import com.github.aytchell.feedbackstates.input.pojos.TransitionPojo;
+import com.github.aytchell.jsonfsm.StateMachineCompiler;
+import com.github.aytchell.jsonfsm.input.pojos.BehaviorPojo;
+import com.github.aytchell.jsonfsm.input.pojos.StateMachinePojo;
+import com.github.aytchell.jsonfsm.input.pojos.StatePojo;
+import com.github.aytchell.jsonfsm.input.pojos.TransitionPojo;
 import com.github.aytchell.validator.Validator;
 import com.github.aytchell.validator.exceptions.ValidationException;
 

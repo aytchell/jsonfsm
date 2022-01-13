@@ -1,11 +1,11 @@
-package com.github.aytchell.feedbackstates.compiler;
+package com.github.aytchell.jsonfsm.compiler;
 
-import com.github.aytchell.feedbackstates.StateMachineParser;
+import com.github.aytchell.jsonfsm.StateMachineParser;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static com.github.aytchell.feedbackstates.compiler.ExceptionMessageChecks.assertThrowsAndMessageReadsLike;
+import static com.github.aytchell.jsonfsm.compiler.ExceptionMessageChecks.assertThrowsAndMessageReadsLike;
 
 class StateMachineParserImplTest {
     @Test
