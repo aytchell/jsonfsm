@@ -7,6 +7,9 @@ import java.util.Set;
 
 class StateMachineImpl implements StateMachine {
     private final com.github.oxo42.stateless4j.StateMachine<String, String> stateMachine;
+
+    private final Set<String> finalStates;
+
     private final EventTranslator mapping;
     @Getter
     private final Set<Integer> controlledDeviceIds;
@@ -15,10 +18,12 @@ class StateMachineImpl implements StateMachine {
 
     public StateMachineImpl(
             com.github.oxo42.stateless4j.StateMachine<String, String> stateMachine,
+            Set<String> finalStates,
             Set<Integer> controlledDeviceIds,
             Set<Integer> handledEventSourceIds,
             EventTranslator mapping) {
         this.stateMachine = stateMachine;
+        this.finalStates = finalStates;
         this.mapping = mapping;
         this.controlledDeviceIds = controlledDeviceIds;
         this.handledEventSourceIds = handledEventSourceIds;
@@ -33,6 +38,11 @@ class StateMachineImpl implements StateMachine {
         }
         stateMachine.fire(eventName);
 
-        return false;
+        if (finalStates.isEmpty()) {
+            return false;
+        }
+
+        final String currentState = stateMachine.getState();
+        return finalStates.contains(currentState);
     }
 }

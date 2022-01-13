@@ -13,10 +13,7 @@ import com.github.oxo42.stateless4j.StateConfiguration;
 import com.github.oxo42.stateless4j.StateMachineConfig;
 import lombok.Getter;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 class StateMachineCompilerImpl implements StateMachineCompiler {
     @Getter
@@ -42,13 +39,14 @@ class StateMachineCompilerImpl implements StateMachineCompiler {
             throws CompilationException {
         checkGivenCompilers(commandCompilers);
         final String initialState = findInitialState(stateMachinePojo);
+        final Set<String> finalStates = findFinalStates(stateMachinePojo);
         buildTriggers();
         buildStates(commandCompilers);
 
         final com.github.oxo42.stateless4j.StateMachine<String, String> stateMachine =
                 new com.github.oxo42.stateless4j.StateMachine<>(initialState, config);
 
-        return new StateMachineImpl(stateMachine, requiredDevices, acceptedEventSources, mapping);
+        return new StateMachineImpl(stateMachine, finalStates, requiredDevices, acceptedEventSources, mapping);
     }
 
     private void checkGivenCompilers(Map<Integer, DeviceCommandCompiler> commandCompilers) throws CompilationException {
@@ -61,6 +59,14 @@ class StateMachineCompilerImpl implements StateMachineCompiler {
 
     private String findInitialState(StateMachinePojo stateMachinePojo) {
         return stateMachinePojo.getInitialState();
+    }
+
+    private Set<String> findFinalStates(StateMachinePojo stateMachinePojo) {
+        final List<String> finalState = stateMachinePojo.getFinalStates();
+        if (finalState == null || finalState.isEmpty()) {
+            return Set.of();
+        }
+        return new HashSet<>(finalState);
     }
 
     private void buildTriggers() {
