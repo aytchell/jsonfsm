@@ -35,7 +35,12 @@ class StateMachineImpl implements StateMachine {
     public boolean injectEvent(int eventSourceId, String eventPayload) {
         final String eventName = mapping.getEventName(eventSourceId, eventPayload);
         if (eventName != null) {
-            stateMachine.fire(eventName);
+            try {
+                stateMachine.fire(eventName);
+            } catch (IllegalStateException e) {
+                log.error("Event '{}' arrived in state '{}' but there's no " +
+                        "matching transition and it's not marked to be ignored", eventName, stateMachine.getState());
+            }
         } else {
             log.info("Ignoring unknown event '{}:{}'", eventSourceId, eventPayload);
         }

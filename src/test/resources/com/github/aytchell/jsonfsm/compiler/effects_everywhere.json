@@ -5,6 +5,11 @@
           "name" : "move",
           "eventSourceId" : 3,
           "eventPayload" : "move ya"
+      },
+      {
+          "name" : "fly",
+          "eventSourceId" : 3,
+          "eventPayload" : "fly away"
       }
   ],
   "states" : [

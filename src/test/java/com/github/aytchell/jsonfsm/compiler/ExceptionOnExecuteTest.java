@@ -44,6 +44,18 @@ public class ExceptionOnExecuteTest {
         exceptionInBehavior("Entering2");
     }
 
+    @Test
+    void eventWithoutMatchingTransition() throws IOException, CompilationException, ValidationException {
+        final String json = readResourceTextFile("effects_everywhere.json");
+        final StateMachineCompiler compiler = StateMachineParser.parseAndListRequiredDeviceIds(json);
+        assertNotNull(compiler);
+
+        EvilDeviceCommandCompiler cmdCompiler = new EvilDeviceCommandCompiler();
+        final StateMachine machine = compiler.compileStateMachine(Map.of(5, cmdCompiler));
+        machine.injectEvent(3, "fly away");
+        // if there's no exception this test is "passed"
+    }
+
     private void exceptionInBehavior(String cmdPrefix) throws IOException, ValidationException, CompilationException {
         final String json = readResourceTextFile("effects_everywhere.json");
         final StateMachineCompiler compiler = StateMachineParser.parseAndListRequiredDeviceIds(json);
@@ -56,14 +68,6 @@ public class ExceptionOnExecuteTest {
         // no exception should leave the above call and all the commands should have been executed
         // (thrown exception does not interfere with the other effects)
         assertEquals(6, cmdCompiler.getExecCounter());
-
-        /*
-        final String commandString = exception.getCommandString();
-        boolean commandAsExpected =
-                commandString.equals("Moving to 'Stop' ...") ^ commandString.equals("Still moving ...");
-        assertTrue(commandAsExpected);
-        assertMessageReadsLike(exception.getLocation(), List.of("transition", "Start", "Stop", "trigger", "move"));
-         */
     }
 
     private static class EvilDeviceCommandCompiler implements DeviceCommandCompiler {
@@ -80,11 +84,11 @@ public class ExceptionOnExecuteTest {
         }
 
         @Override
-        public DeviceCommand compile(String commandString) throws CompilationException {
+        public DeviceCommand compile(String commandString) {
             if (prefix == null || commandString.startsWith(prefix)) {
                 return () -> { ++execCounter; throw new RuntimeException("Booom!"); };
             }
-            return () -> { ++execCounter; };
+            return () -> ++execCounter;
         }
     }
 }
