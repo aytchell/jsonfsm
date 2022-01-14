@@ -92,8 +92,8 @@ public class StateMachinePojoValidatorTest {
     }
 
     @Test
-    void unknownFinalStateWillThrow() {
-        parseFileAssertThrowsAndMessageReadsLike("unknown_final_state.json",
-                List.of("'finalStates[0]", "'Three'", "is contained in states"));
+    void transitionsWithSameTriggerWillThrow() {
+        parseFileAssertThrowsAndMessageReadsLike("duplicate_trigger.json",
+                List.of("triggerName", "is unique"));
     }
 }

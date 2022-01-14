@@ -1,0 +1,29 @@
+{
+  "initialState" : "Start",
+  "triggers" : [
+    {
+      "name" : "move",
+      "eventSourceId" : 1,
+      "eventPayload" : "move ya"
+    }
+  ],
+  "states" : [
+    {
+      "name" : "Start",
+      "transitions" : [{
+        "triggerName" : "move",
+        "targetState" : "Good"
+      },
+      {
+        "triggerName" : "move",
+        "targetState" : "Bad"
+      }]
+    },
+    {
+      "name" : "Good"
+    },
+    {
+      "name" : "Bad"
+    }
+  ]
+}

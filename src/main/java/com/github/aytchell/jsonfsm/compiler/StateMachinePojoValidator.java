@@ -2,6 +2,7 @@ package com.github.aytchell.jsonfsm.compiler;
 
 import com.github.aytchell.jsonfsm.input.pojos.BehaviorPojo;
 import com.github.aytchell.jsonfsm.input.pojos.StateMachinePojo;
+import com.github.aytchell.jsonfsm.input.pojos.StatePojo;
 import com.github.aytchell.jsonfsm.input.pojos.TransitionPojo;
 import com.github.aytchell.validator.Validator;
 import com.github.aytchell.validator.exceptions.ValidationException;
@@ -64,6 +65,29 @@ class StateMachinePojoValidator {
         Validator.expect(stateMachinePojo.getStates(), "states").notNull().notEmpty().eachCustomEntry(
                 state -> Validator.expect(state.getTransitions(), "transitions").ifNotNull()
                         .eachCustomEntry(this::validateTransition));
+
+        Validator.expect(stateMachinePojo.getStates(), "states").notNull().notEmpty().eachCustomEntry(
+                state -> {
+                    final List<TransitionPojo> transitions = state.getTransitions();
+                    Validator.expect(transitions, "transitions").ifNotNull()
+                            .eachCustomEntry(t -> onlyOneEntry(t, transitions));
+                });
+    }
+
+    private void onlyOneEntry(TransitionPojo t, List<TransitionPojo> transitions) throws ValidationException {
+        int counter = 0;
+        for (TransitionPojo check : transitions) {
+            if (check.getTriggerName().equals(t.getTriggerName())) {
+                ++counter;
+            }
+        }
+        if (counter > 1) {
+            throw new ValidationException()
+                    .setActualValuesName("triggerName")
+                    .setActualValue(t.getTriggerName())
+                    .setExpectation("is unique withing this state");
+
+        }
     }
 
     private void validateInitialState() throws ValidationException {
