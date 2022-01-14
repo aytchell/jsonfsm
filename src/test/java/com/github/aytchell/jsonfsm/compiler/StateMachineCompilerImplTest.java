@@ -193,6 +193,35 @@ public class StateMachineCompilerImplTest {
         assertFalse(isStateTwoNowFinal);
     }
 
+    @Test
+    void unknownEventIsIgnored() throws IOException, ValidationException, CompilationException {
+        final String json = readResourceTextFile("final_states.json");
+        final StateMachineCompiler compiler = StateMachineParser.parseAndListRequiredDeviceIds(json);
+        assertNotNull(compiler);
+        assertNotNull(compiler.getRequiredDevices());
+
+        final Set<Integer> devices = compiler.getRequiredDevices();
+        assertTrue(devices.isEmpty());
+
+        final StateMachine stateMachine = compiler.compileStateMachine(Map.of());
+        // transition "One" --> "Two"
+        final boolean isStateTwoFinal = stateMachine.injectEvent(1, "move ya");
+        assertFalse(isStateTwoFinal);
+
+        // ignore unknown events
+        stateMachine.injectEvent(2, "move ya");
+        stateMachine.injectEvent(1, "move me");
+
+        // transition "Two" --> "Three"
+        final boolean isStateThreeFinal = stateMachine.injectEvent(1, "move ya");
+        assertTrue(isStateThreeFinal);
+
+        // ignore unknown events
+        stateMachine.injectEvent(2, "move ya");
+        final boolean isStillFinal = stateMachine.injectEvent(1, "move me");
+        assertTrue(isStillFinal);
+    }
+
     private static class LogDeviceCommand implements DeviceCommand {
         private final String prefix;
         private final StringBuffer sb;

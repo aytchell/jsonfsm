@@ -78,16 +78,7 @@ class StateMachineCompilerImpl implements StateMachineCompiler {
 
     private void buildStates(Map<Integer, DeviceCommandCompiler> commandCompilers) throws CompilationException {
         for (StatePojo state : stateMachinePojo.getStates()) {
-            try {
-                // inside this method we might call one or more device command compilers and
-                // nobody knows what might happen ...
-                buildSingleState(state, commandCompilers);
-            } catch (CompilationException ce) {
-                throw ce;
-            } catch (Exception e) {
-                throw new CompilationException(
-                        "Exception while compiling state '" + state.getName() + "': " + e.getMessage(), e);
-            }
+            buildSingleState(state, commandCompilers);
         }
     }
 
@@ -100,24 +91,25 @@ class StateMachineCompilerImpl implements StateMachineCompiler {
         addTransitions(state, name, statePojo.getTransitions(), commandCompilers);
     }
 
-    private void addEntryCommandsToState(StateConfiguration<String, String> state,
-                                         String stateName,
-                                         List<BehaviorPojo> entryCommands, Map<Integer, DeviceCommandCompiler> commandCompilers)
+    private void addEntryCommandsToState(
+            StateConfiguration<String, String> state, String stateName,
+            List<BehaviorPojo> entryCommands, Map<Integer, DeviceCommandCompiler> commandCompilers)
             throws CompilationException {
         final String location = "onEntry (" + stateName + ")";
         addBehaviorToState(location, entryCommands, commandCompilers, state::onEntry);
     }
 
-    private void addExitCommandsToState(StateConfiguration<String, String> state, String stateName,
-                                        List<BehaviorPojo> exitCommands, Map<Integer, DeviceCommandCompiler> commandCompilers)
+    private void addExitCommandsToState(
+            StateConfiguration<String, String> state, String stateName,
+            List<BehaviorPojo> exitCommands, Map<Integer, DeviceCommandCompiler> commandCompilers)
             throws CompilationException {
         final String location = "onExit (" + stateName + ")";
         addBehaviorToState(location, exitCommands, commandCompilers, state::onExit);
     }
 
-    private void addBehaviorToState(String location, List<BehaviorPojo> commands,
-                                    Map<Integer, DeviceCommandCompiler> commandCompilers,
-                                    ActionAppender appender)
+    private void addBehaviorToState(
+            String location, List<BehaviorPojo> commands,
+            Map<Integer, DeviceCommandCompiler> commandCompilers, ActionAppender appender)
             throws InternalCompilationException {
         if (commands == null || commands.isEmpty()) {
             return;
@@ -134,10 +126,10 @@ class StateMachineCompilerImpl implements StateMachineCompiler {
         }
     }
 
-    private void addTransitions(StateConfiguration<String, String> state,
-                                String stateName,
-                                List<TransitionPojo> transitions,
-                                Map<Integer, DeviceCommandCompiler> commandCompilers) throws CompilationException {
+    private void addTransitions(
+            StateConfiguration<String, String> state, String stateName,
+            List<TransitionPojo> transitions,
+            Map<Integer, DeviceCommandCompiler> commandCompilers) throws CompilationException {
         if (transitions == null) {
             return;
         }

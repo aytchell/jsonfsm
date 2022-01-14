@@ -81,7 +81,8 @@ public class CompilationExceptionTest {
         @Override
         public DeviceCommand compile(String commandString) throws CompilationException {
             if (prefix == null || commandString.startsWith(prefix)) {
-                throw new CompilationException("Booom!");
+                //throw new CompilationException("Booom!");
+                throw new RuntimeException("Booom!");
             }
             return () -> { };
         }

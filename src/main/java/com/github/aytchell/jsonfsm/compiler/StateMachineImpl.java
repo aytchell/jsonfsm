@@ -2,9 +2,11 @@ package com.github.aytchell.jsonfsm.compiler;
 
 import com.github.aytchell.jsonfsm.StateMachine;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.Set;
 
+@Slf4j
 class StateMachineImpl implements StateMachine {
     private final com.github.oxo42.stateless4j.StateMachine<String, String> stateMachine;
 
@@ -32,11 +34,11 @@ class StateMachineImpl implements StateMachine {
     @Override
     public boolean injectEvent(int eventSourceId, String eventPayload) {
         final String eventName = mapping.getEventName(eventSourceId, eventPayload);
-        if (eventName == null) {
-            throw new IllegalArgumentException("Payload '" + eventPayload + "' from event source " +
-                                               eventSourceId + " not known by state machine");
+        if (eventName != null) {
+            stateMachine.fire(eventName);
+        } else {
+            log.info("Ignoring unknown event '{}:{}'", eventSourceId, eventPayload);
         }
-        stateMachine.fire(eventName);
 
         if (finalStates.isEmpty()) {
             return false;
