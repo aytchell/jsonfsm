@@ -66,12 +66,38 @@ class StateMachinePojoValidator {
                 state -> Validator.expect(state.getTransitions(), "transitions").ifNotNull()
                         .eachCustomEntry(this::validateTransition));
 
+        validateStateNamesAreUnique();
+        validateTriggerNamesAreUniqueWithinState();
+    }
+
+    private void validateStateNamesAreUnique() throws ValidationException {
+        final List<StatePojo> states = stateMachinePojo.getStates();
+        Validator.expect(states, "states").notNull().notEmpty().eachCustomEntry(
+                s -> onlyOneEntry(s, states));
+    }
+
+    private void validateTriggerNamesAreUniqueWithinState() throws ValidationException {
         Validator.expect(stateMachinePojo.getStates(), "states").notNull().notEmpty().eachCustomEntry(
                 state -> {
                     final List<TransitionPojo> transitions = state.getTransitions();
                     Validator.expect(transitions, "transitions").ifNotNull()
                             .eachCustomEntry(t -> onlyOneEntry(t, transitions));
                 });
+    }
+
+    private void onlyOneEntry(StatePojo s, List<StatePojo> states) throws ValidationException {
+        int counter = 0;
+        for (StatePojo check : states) {
+            if (check.getName().equals(s.getName())) {
+                ++counter;
+            }
+        }
+        if (counter > 1) {
+            throw new ValidationException()
+                    .setActualValuesName("name")
+                    .setActualValue(s.getName())
+                    .setExpectation("is unique throughout all states");
+        }
     }
 
     private void onlyOneEntry(TransitionPojo t, List<TransitionPojo> transitions) throws ValidationException {

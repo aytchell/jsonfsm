@@ -94,6 +94,12 @@ public class StateMachinePojoValidatorTest {
     @Test
     void transitionsWithSameTriggerWillThrow() {
         parseFileAssertThrowsAndMessageReadsLike("duplicate_trigger.json",
-                List.of("triggerName", "is unique"));
+                List.of("triggerName", "move", "is unique"));
+    }
+
+    @Test
+    void statesWithSameNameWillThrow() {
+        parseFileAssertThrowsAndMessageReadsLike("duplicate_state_name.json",
+                List.of("states", "name", "Start", "is unique"));
     }
 }
