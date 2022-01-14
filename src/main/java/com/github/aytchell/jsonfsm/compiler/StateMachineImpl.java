@@ -52,4 +52,9 @@ class StateMachineImpl implements StateMachine {
         final String currentState = stateMachine.getState();
         return finalStates.contains(currentState);
     }
+
+    @Override
+    public String getCurrentState() {
+        return stateMachine.getState();
+    }
 }

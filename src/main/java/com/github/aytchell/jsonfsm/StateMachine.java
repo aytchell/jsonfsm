@@ -8,4 +8,6 @@ public interface StateMachine {
     Set<Integer> getControlledDeviceIds();
 
     Set<Integer> getHandledEventSourceIds();
+
+    String getCurrentState();
 }

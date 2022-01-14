@@ -178,6 +178,27 @@ public class StateMachineCompileAndRunTest {
     }
 
     @Test
+    void currentStateIsCorrect() throws IOException, ValidationException, CompilationException {
+        final String json = readResourceTextFile("final_states.json");
+        final StateMachineCompiler compiler = StateMachineParser.parse(json);
+        assertNotNull(compiler);
+
+        final StateMachine stateMachine = compiler.compileStateMachine(Map.of());
+        // transition "One" --> "Two"
+        stateMachine.injectEvent(1, "move ya");
+        assertEquals("Two", stateMachine.getCurrentState());
+        // transition "Two" --> "Three"
+        stateMachine.injectEvent(1, "move ya");
+        assertEquals("Three", stateMachine.getCurrentState());
+        // transition "Three" --> "One"
+        stateMachine.injectEvent(1, "move ya");
+        assertEquals("One", stateMachine.getCurrentState());
+        // transition "One" --> "Two"
+        stateMachine.injectEvent(1, "move ya");
+        assertEquals("Two", stateMachine.getCurrentState());
+    }
+
+    @Test
     void unknownEventIsIgnored() throws IOException, ValidationException, CompilationException {
         final String json = readResourceTextFile("final_states.json");
         final StateMachineCompiler compiler = StateMachineParser.parse(json);
