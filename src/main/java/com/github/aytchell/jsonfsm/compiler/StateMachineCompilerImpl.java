@@ -117,7 +117,8 @@ class StateMachineCompilerImpl implements StateMachineCompiler {
 
         for (BehaviorPojo cmd : commands) {
             try {
-                final DeviceCommand command = commandCompilers.get(cmd.getDeviceId()).compile(cmd.getCommandString());
+                final DeviceCommand command = new DeviceCommandWrapper(
+                        commandCompilers.get(cmd.getDeviceId()).compile(cmd.getCommandString()));
                 appender.addBehavior(command::execute);
             } catch (Exception e) {
                 throw new InternalCompilationException(e.getMessage(), e.getCause(),
@@ -164,7 +165,8 @@ class StateMachineCompilerImpl implements StateMachineCompiler {
         final List<DeviceCommand> commands = new LinkedList<>();
         for (BehaviorPojo e : effects) {
             try {
-                commands.add(commandCompilers.get(e.getDeviceId()).compile(e.getCommandString()));
+                commands.add(new DeviceCommandWrapper(
+                        commandCompilers.get(e.getDeviceId()).compile(e.getCommandString())));
             } catch (Exception exception) {
                 // enrich exception with the information we used to compile the command
                 throw new InternalCompilationException(exception.getMessage(), exception.getCause(),
