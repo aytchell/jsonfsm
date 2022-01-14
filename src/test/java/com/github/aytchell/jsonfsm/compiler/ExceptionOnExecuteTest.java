@@ -47,7 +47,7 @@ public class ExceptionOnExecuteTest {
     @Test
     void eventWithoutMatchingTransition() throws IOException, CompilationException, ValidationException {
         final String json = readResourceTextFile("effects_everywhere.json");
-        final StateMachineCompiler compiler = StateMachineParser.parseAndListRequiredDeviceIds(json);
+        final StateMachineCompiler compiler = StateMachineParser.parse(json);
         assertNotNull(compiler);
 
         EvilDeviceCommandCompiler cmdCompiler = new EvilDeviceCommandCompiler();
@@ -58,7 +58,7 @@ public class ExceptionOnExecuteTest {
 
     private void exceptionInBehavior(String cmdPrefix) throws IOException, ValidationException, CompilationException {
         final String json = readResourceTextFile("effects_everywhere.json");
-        final StateMachineCompiler compiler = StateMachineParser.parseAndListRequiredDeviceIds(json);
+        final StateMachineCompiler compiler = StateMachineParser.parse(json);
         assertNotNull(compiler);
 
         EvilDeviceCommandCompiler cmdCompiler = new EvilDeviceCommandCompiler(cmdPrefix);

@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class ExceptionMessageChecks {
     public static void parseFileAssertThrowsAndMessageReadsLike(String filename, List<String> substrings) {
         final ValidationException e = assertThrows(ValidationException.class,
-                () -> StateMachineParser.parseAndListRequiredDeviceIds(readResourceTextFile(filename)));
+                () -> StateMachineParser.parse(readResourceTextFile(filename)));
         assertMessageReadsLike(e, substrings);
     }
 

@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static com.github.aytchell.jsonfsm.compiler.ExceptionMessageChecks.assertMessageReadsLike;
 import static com.github.aytchell.jsonfsm.compiler.ExceptionMessageChecks.readResourceTextFile;
@@ -22,7 +23,7 @@ public class CompilationExceptionTest {
     @Test
     void compilationExceptionInTransitionEffect() throws IOException, ValidationException {
         final String json = readResourceTextFile("multiple_effects.json");
-        final StateMachineCompiler compiler = StateMachineParser.parseAndListRequiredDeviceIds(json);
+        final StateMachineCompiler compiler = StateMachineParser.parse(json);
         assertNotNull(compiler);
 
         CompilationException exception = assertThrows(
@@ -40,7 +41,7 @@ public class CompilationExceptionTest {
     @Test
     void compilationExceptionOnEntry() throws IOException, ValidationException {
         final String json = readResourceTextFile("simple_exit_enter.json");
-        final StateMachineCompiler compiler = StateMachineParser.parseAndListRequiredDeviceIds(json);
+        final StateMachineCompiler compiler = StateMachineParser.parse(json);
         assertNotNull(compiler);
 
         CompilationException exception = assertThrows(
@@ -55,7 +56,7 @@ public class CompilationExceptionTest {
     @Test
     void compilationExceptionOnExit() throws IOException, ValidationException {
         final String json = readResourceTextFile("simple_exit_enter.json");
-        final StateMachineCompiler compiler = StateMachineParser.parseAndListRequiredDeviceIds(json);
+        final StateMachineCompiler compiler = StateMachineParser.parse(json);
         assertNotNull(compiler);
 
         CompilationException exception = assertThrows(
@@ -79,7 +80,7 @@ public class CompilationExceptionTest {
         }
 
         @Override
-        public DeviceCommand compile(String commandString) throws CompilationException {
+        public DeviceCommand compile(String commandString) {
             if (prefix == null || commandString.startsWith(prefix)) {
                 //throw new CompilationException("Booom!");
                 throw new RuntimeException("Booom!");

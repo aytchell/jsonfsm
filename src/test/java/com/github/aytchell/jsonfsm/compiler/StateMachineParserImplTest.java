@@ -11,18 +11,18 @@ class StateMachineParserImplTest {
     @Test
     void emptyInputGivenThrows() {
         assertThrowsAndMessageReadsLike(
-                () -> StateMachineParser.parseAndListRequiredDeviceIds(null),
+                () -> StateMachineParser.parse(null),
                 List.of("'jsonStateMachine'", "is not null"));
 
         assertThrowsAndMessageReadsLike(
-                () -> StateMachineParser.parseAndListRequiredDeviceIds(""),
+                () -> StateMachineParser.parse(""),
                 List.of("'jsonStateMachine'", "is not blank"));
     }
 
     @Test
     void brokenJsonAsInputFailsProperly() {
         assertThrowsAndMessageReadsLike(
-                () -> StateMachineParser.parseAndListRequiredDeviceIds(
+                () -> StateMachineParser.parse(
                         "{ \"initialState\" }"),
                 List.of("Error while parsing", "Unexpected character"));
     }

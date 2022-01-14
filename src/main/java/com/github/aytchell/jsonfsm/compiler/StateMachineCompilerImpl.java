@@ -53,7 +53,9 @@ class StateMachineCompilerImpl implements StateMachineCompiler {
     private void checkGivenCompilers(Map<Integer, DeviceCommandCompiler> commandCompilers) throws CompilationException {
         for (Integer id : requiredDevices) {
             if (!commandCompilers.containsKey(id)) {
-                throw new CompilationException("compiler for commands of device " + id + " is missing");
+                throw new CompilationException(
+                        "compiler for commands of device " + id + " is missing", null,
+                        "none", id, "none");
             }
         }
     }
@@ -110,7 +112,7 @@ class StateMachineCompilerImpl implements StateMachineCompiler {
     private void addBehaviorToState(
             String location, List<BehaviorPojo> commands,
             Map<Integer, DeviceCommandCompiler> commandCompilers, ActionAppender appender)
-            throws InternalCompilationException {
+            throws CompilationException {
         if (commands == null || commands.isEmpty()) {
             return;
         }
@@ -122,7 +124,7 @@ class StateMachineCompilerImpl implements StateMachineCompiler {
                         location, cmd.getDeviceId(), cmd.getCommandString());
                 appender.addBehavior(command::execute);
             } catch (Exception e) {
-                throw new InternalCompilationException(e.getMessage(), e.getCause(),
+                throw new CompilationException(e.getMessage(), e,
                         location, cmd.getDeviceId(), cmd.getCommandString());
             }
         }
@@ -167,7 +169,7 @@ class StateMachineCompilerImpl implements StateMachineCompiler {
                         location, e.getDeviceId(), e.getCommandString()));
             } catch (Exception exception) {
                 // enrich exception with the information we used to compile the command
-                throw new InternalCompilationException(exception.getMessage(), exception.getCause(),
+                throw new CompilationException(exception.getMessage(), exception,
                         location, e.getDeviceId(), e.getCommandString());
             }
         }

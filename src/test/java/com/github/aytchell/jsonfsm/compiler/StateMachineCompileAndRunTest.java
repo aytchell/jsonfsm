@@ -17,11 +17,11 @@ import java.util.Set;
 import static com.github.aytchell.jsonfsm.compiler.ExceptionMessageChecks.readResourceTextFile;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class StateMachineCompilerImplTest {
+public class StateMachineCompileAndRunTest {
     @Test
     void commandOnExitAndEnter() throws IOException, ValidationException, CompilationException {
         final String json = readResourceTextFile("simple_exit_enter.json");
-        final StateMachineCompiler compiler = StateMachineParser.parseAndListRequiredDeviceIds(json);
+        final StateMachineCompiler compiler = StateMachineParser.parse(json);
         assertNotNull(compiler);
         assertNotNull(compiler.getRequiredDevices());
 
@@ -39,7 +39,7 @@ public class StateMachineCompilerImplTest {
     @Test
     void commandOnTransition() throws IOException, ValidationException, CompilationException {
         final String json = readResourceTextFile("effect_on_transition.json");
-        final StateMachineCompiler compiler = StateMachineParser.parseAndListRequiredDeviceIds(json);
+        final StateMachineCompiler compiler = StateMachineParser.parse(json);
         assertNotNull(compiler);
         assertNotNull(compiler.getRequiredDevices());
 
@@ -57,7 +57,7 @@ public class StateMachineCompilerImplTest {
     @Test
     void multipleDevicesAndCommands() throws IOException, ValidationException, CompilationException {
         final String json = readResourceTextFile("multiple_devices_and_cmds.json");
-        final StateMachineCompiler compiler = StateMachineParser.parseAndListRequiredDeviceIds(json);
+        final StateMachineCompiler compiler = StateMachineParser.parse(json);
         assertNotNull(compiler);
         assertNotNull(compiler.getRequiredDevices());
         assertEquals(Set.of(1, 2, 3, 4), compiler.getRequiredDevices());
@@ -81,7 +81,7 @@ public class StateMachineCompilerImplTest {
     @Test
     void multipleEffectsOnTransition() throws IOException, ValidationException, CompilationException {
         final String json = readResourceTextFile("multiple_effects.json");
-        final StateMachineCompiler compiler = StateMachineParser.parseAndListRequiredDeviceIds(json);
+        final StateMachineCompiler compiler = StateMachineParser.parse(json);
         assertNotNull(compiler);
         assertNotNull(compiler.getRequiredDevices());
         assertEquals(Set.of(10), compiler.getRequiredDevices());
@@ -101,7 +101,7 @@ public class StateMachineCompilerImplTest {
     @Test
     void notEnoughDeviceCompilersGivenThrows() throws IOException, ValidationException {
         final String json = readResourceTextFile("multiple_devices_and_cmds.json");
-        final StateMachineCompiler compiler = StateMachineParser.parseAndListRequiredDeviceIds(json);
+        final StateMachineCompiler compiler = StateMachineParser.parse(json);
 
         final Map<Integer, DeviceCommandCompiler> compilers = new HashMap<>();
         compilers.put(1, new LogDeviceCommandCompiler("", new StringBuffer()));
@@ -112,25 +112,9 @@ public class StateMachineCompilerImplTest {
     }
 
     @Test
-    void exceptionFromDeviceCommandCompilerIsForwarded() throws IOException, ValidationException {
-        final String json = readResourceTextFile("simple_exit_enter.json");
-        final StateMachineCompiler compiler = StateMachineParser.parseAndListRequiredDeviceIds(json);
-        assertNotNull(compiler);
-        assertNotNull(compiler.getRequiredDevices());
-
-        final Set<Integer> devices = compiler.getRequiredDevices();
-        assertEquals(1, devices.size());
-        assertTrue(devices.contains(10));
-
-        assertThrows(CompilationException.class, () -> compiler.compileStateMachine(
-                Map.of(10, new BadDeviceCommandCompiler())
-        ));
-    }
-
-    @Test
     void superfluousIgnoreIsIgnored() throws IOException, ValidationException, CompilationException {
         final String json = readResourceTextFile("ignore_false.json");
-        final StateMachineCompiler compiler = StateMachineParser.parseAndListRequiredDeviceIds(json);
+        final StateMachineCompiler compiler = StateMachineParser.parse(json);
         assertNotNull(compiler);
         assertNotNull(compiler.getRequiredDevices());
 
@@ -150,7 +134,7 @@ public class StateMachineCompilerImplTest {
     @Test
     void ignoreEntryIsRespected() throws IOException, ValidationException, CompilationException {
         final String json = readResourceTextFile("ignore_true.json");
-        final StateMachineCompiler compiler = StateMachineParser.parseAndListRequiredDeviceIds(json);
+        final StateMachineCompiler compiler = StateMachineParser.parse(json);
         assertNotNull(compiler);
         assertNotNull(compiler.getRequiredDevices());
 
@@ -171,7 +155,7 @@ public class StateMachineCompilerImplTest {
     @Test
     void returnValueReflectsFinalStates() throws IOException, ValidationException, CompilationException {
         final String json = readResourceTextFile("final_states.json");
-        final StateMachineCompiler compiler = StateMachineParser.parseAndListRequiredDeviceIds(json);
+        final StateMachineCompiler compiler = StateMachineParser.parse(json);
         assertNotNull(compiler);
         assertNotNull(compiler.getRequiredDevices());
 
@@ -196,7 +180,7 @@ public class StateMachineCompilerImplTest {
     @Test
     void unknownEventIsIgnored() throws IOException, ValidationException, CompilationException {
         final String json = readResourceTextFile("final_states.json");
-        final StateMachineCompiler compiler = StateMachineParser.parseAndListRequiredDeviceIds(json);
+        final StateMachineCompiler compiler = StateMachineParser.parse(json);
         assertNotNull(compiler);
         assertNotNull(compiler.getRequiredDevices());
 
@@ -252,13 +236,6 @@ public class StateMachineCompilerImplTest {
         @Override
         public DeviceCommand compile(String commandString) {
             return new LogDeviceCommand(customPrefix, sb, commandString);
-        }
-    }
-
-    private static class BadDeviceCommandCompiler implements DeviceCommandCompiler {
-        @Override
-        public DeviceCommand compile(String commandString) {
-            throw new RuntimeException("Really bad exception");
         }
     }
 }
