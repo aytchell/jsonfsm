@@ -118,7 +118,8 @@ class StateMachineCompilerImpl implements StateMachineCompiler {
         for (BehaviorPojo cmd : commands) {
             try {
                 final DeviceCommand command = new DeviceCommandWrapper(
-                        commandCompilers.get(cmd.getDeviceId()).compile(cmd.getCommandString()));
+                        commandCompilers.get(cmd.getDeviceId()).compile(cmd.getCommandString()),
+                        location, cmd.getDeviceId(), cmd.getCommandString());
                 appender.addBehavior(command::execute);
             } catch (Exception e) {
                 throw new InternalCompilationException(e.getMessage(), e.getCause(),
@@ -142,16 +143,12 @@ class StateMachineCompilerImpl implements StateMachineCompiler {
                 if (effects == null || effects.isEmpty()) {
                     state.permit(t.getTriggerName(), t.getTargetState());
                 } else {
-                    try {
-                        final DeviceCommand command = compileDeviceCommandChain(effects, commandCompilers);
-                        state.permit(t.getTriggerName(), t.getTargetState(), command::execute);
-                    } catch (CompilationException e) {
-                        final String location =
-                                "transition (" + stateName + " -> " + t.getTargetState() +
-                                "; trigger: " + t.getTriggerName() + ")";
-                        throw new InternalCompilationException(e.getMessage(), e.getCause(),
-                                location, e.getDeviceId(), e.getCommandString());
-                    }
+                    final String location =
+                            "transition (" + stateName + " -> " + t.getTargetState() +
+                                    "; trigger: " + t.getTriggerName() + ")";
+                    final DeviceCommand command = compileDeviceCommandChain(
+                            location, effects, commandCompilers);
+                    state.permit(t.getTriggerName(), t.getTargetState(), command::execute);
                 }
             } else {
                 state.ignore(t.getTriggerName());
@@ -160,17 +157,18 @@ class StateMachineCompilerImpl implements StateMachineCompiler {
     }
 
     private DeviceCommand compileDeviceCommandChain(
-            List<BehaviorPojo> effects,
+            String location, List<BehaviorPojo> effects,
             Map<Integer,DeviceCommandCompiler> commandCompilers) throws CompilationException {
         final List<DeviceCommand> commands = new LinkedList<>();
         for (BehaviorPojo e : effects) {
             try {
                 commands.add(new DeviceCommandWrapper(
-                        commandCompilers.get(e.getDeviceId()).compile(e.getCommandString())));
+                        commandCompilers.get(e.getDeviceId()).compile(e.getCommandString()),
+                        location, e.getDeviceId(), e.getCommandString()));
             } catch (Exception exception) {
                 // enrich exception with the information we used to compile the command
                 throw new InternalCompilationException(exception.getMessage(), exception.getCause(),
-                        "unknown", e.getDeviceId(), e.getCommandString());
+                        location, e.getDeviceId(), e.getCommandString());
             }
         }
         return () -> commands.forEach(DeviceCommand::execute);
