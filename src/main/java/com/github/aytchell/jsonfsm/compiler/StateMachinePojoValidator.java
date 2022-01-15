@@ -1,9 +1,6 @@
 package com.github.aytchell.jsonfsm.compiler;
 
-import com.github.aytchell.jsonfsm.input.pojos.BehaviorPojo;
-import com.github.aytchell.jsonfsm.input.pojos.StateMachinePojo;
-import com.github.aytchell.jsonfsm.input.pojos.StatePojo;
-import com.github.aytchell.jsonfsm.input.pojos.TransitionPojo;
+import com.github.aytchell.jsonfsm.input.pojos.*;
 import com.github.aytchell.validator.Validator;
 import com.github.aytchell.validator.exceptions.ValidationException;
 
@@ -38,15 +35,35 @@ class StateMachinePojoValidator {
     }
 
     private void validateTriggers() throws ValidationException {
-        Validator.expect(stateMachinePojo.getTriggers(), "triggers").notNull().notEmpty()
+        final List<TriggerPojo> allTriggers = stateMachinePojo.getTriggers();
+        Validator.expect(allTriggers, "triggers").notNull().notEmpty()
                 .eachCustomEntry(
                         trigger -> {
                             Validator.expect(trigger.getName(), "name").notNull().notBlank();
                             Validator.expect(trigger.getEventSourceId(), "eventSourceId").notNull().greaterThan(0);
                             Validator.expect(trigger.getEventPayload(), "eventPayload").notNull().notBlank();
+                            onlyOneSuchTriggerContent(trigger, allTriggers);
                             knownTriggerNames.add(trigger.getName());
                         }
                 );
+    }
+
+    private void onlyOneSuchTriggerContent(TriggerPojo trigger, List<TriggerPojo> allTriggers)
+            throws ValidationException {
+        int counter = 0;
+        for (TriggerPojo check : allTriggers) {
+            final boolean sameSourceId = check.getEventSourceId().equals(trigger.getEventSourceId());
+            final boolean samePayload = check.getEventPayload().equals(trigger.getEventPayload());
+            if (sameSourceId && samePayload) {
+                ++counter;
+            }
+        }
+        if (counter > 1) {
+            throw new ValidationException()
+                    .setActualValuesName("name")
+                    .setActualValue(trigger.getName())
+                    .setExpectation("has unique entries throughout triggers");
+        }
     }
 
     private void validateStates() throws ValidationException {
