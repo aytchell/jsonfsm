@@ -42,10 +42,27 @@ class StateMachinePojoValidator {
                             Validator.expect(trigger.getName(), "name").notNull().notBlank();
                             Validator.expect(trigger.getEventSourceId(), "eventSourceId").notNull().greaterThan(0);
                             Validator.expect(trigger.getEventPayload(), "eventPayload").notNull().notBlank();
+                            onlyOneSuchTriggerName(trigger, allTriggers);
                             onlyOneSuchTriggerContent(trigger, allTriggers);
                             knownTriggerNames.add(trigger.getName());
                         }
                 );
+    }
+
+    private void onlyOneSuchTriggerName(TriggerPojo trigger, List<TriggerPojo> allTriggers)
+            throws ValidationException {
+        int counter = 0;
+        for (TriggerPojo check : allTriggers) {
+            if (trigger.getName().equals(check.getName())) {
+                ++counter;
+            }
+        }
+        if (counter > 1) {
+            throw new ValidationException()
+                    .setActualValuesName("name")
+                    .setActualValue(trigger.getName())
+                    .setExpectation("is unique throughout all triggers");
+        }
     }
 
     private void onlyOneSuchTriggerContent(TriggerPojo trigger, List<TriggerPojo> allTriggers)
