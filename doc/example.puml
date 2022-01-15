@@ -1,0 +1,13 @@
+@startuml
+
+[*] --> Start
+Start : exit/ execute(1, "Exiting1")
+Start : exit/ execute(5, "Exiting2")
+
+Stop : entry/ execute(1, "Entering1")
+Stop : entry/ execute(5, "Entering2")
+
+Start -down-> Stop : event(3, "move ya")\n/execute(1, "Moving1")\nexecute(5, "Moving2")
+Stop --> [*]
+
+@enduml

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" contentScriptType="application/ecmascript" contentStyleType="text/css" height="416px" preserveAspectRatio="none" style="width:266px;height:416px;" version="1.1" viewBox="0 0 266 416" width="266px" zoomAndPan="magnify"><defs><filter height="300%" id="f1addvan9vm520" width="300%" x="-1" y="-1"><feGaussianBlur result="blurOut" stdDeviation="2.0"/><feColorMatrix in="blurOut" result="blurOut2" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .4 0"/><feOffset dx="4.0" dy="4.0" in="blurOut2" result="blurOut3"/><feBlend in="SourceGraphic" in2="blurOut3" mode="normal"/></filter></defs><g><ellipse cx="109.5" cy="18" fill="#000000" filter="url(#f1addvan9vm520)" rx="10" ry="10" style="stroke: none; stroke-width: 1.0;"/><rect fill="#FEFECE" filter="url(#f1addvan9vm520)" height="64.2344" rx="12.5" ry="12.5" style="stroke: #A80036; stroke-width: 1.5;" width="185" x="17" y="89"/><line style="stroke: #A80036; stroke-width: 1.5;" x1="17" x2="202" y1="115.2969" y2="115.2969"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="32" x="93.5" y="106.9951">Start</text><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="165" x="22" y="131.4355">exit/ execute(1, "Exiting1")</text><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="165" x="22" y="145.4043">exit/ execute(5, "Exiting2")</text><rect fill="#FEFECE" filter="url(#f1addvan9vm520)" height="64.2344" rx="12.5" ry="12.5" style="stroke: #A80036; stroke-width: 1.5;" width="207" x="6" y="260"/><line style="stroke: #A80036; stroke-width: 1.5;" x1="6" x2="213" y1="286.2969" y2="286.2969"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="32" x="93.5" y="277.9951">Stop</text><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="187" x="11" y="302.4355">entry/ execute(1, "Entering1")</text><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="187" x="11" y="316.4043">entry/ execute(5, "Entering2")</text><ellipse cx="109.5" cy="395" fill="none" filter="url(#f1addvan9vm520)" rx="10" ry="10" style="stroke: #000000; stroke-width: 1.0;"/><ellipse cx="110" cy="395.5" fill="#000000" rx="6" ry="6" style="stroke: none; stroke-width: 1.0;"/><!--MD5=[a0be3251f15ef50a7257de6fc99fd504]
+link *start to Start--><path d="M109.5,28.32 C109.5,40.78 109.5,63.6 109.5,83.35 " fill="none" id="*start-&gt;Start" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="109.5,88.56,113.5,79.56,109.5,83.56,105.5,79.56,109.5,88.56" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[9c6512fe9f206210ece9c1fcff26181a]
+link Start to Stop--><path d="M109.5,153.39 C109.5,182.09 109.5,224.52 109.5,254.67 " fill="none" id="Start-&gt;Stop" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="109.5,259.78,113.5,250.78,109.5,254.78,105.5,250.78,109.5,259.78" style="stroke: #A80036; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="127" x="119" y="196.0669">event(3, "move ya")</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="144" x="110.5" y="211.1997">/execute(1, "Moving1")</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="140" x="112.5" y="226.3325">execute(5, "Moving2")</text><!--MD5=[2152162db629b111ca8abeeac6537e55]
+link Stop to *end--><path d="M109.5,324.13 C109.5,342.55 109.5,365.02 109.5,379.42 " fill="none" id="Stop-&gt;*end" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="109.5,384.7,113.5,375.7,109.5,379.7,105.5,375.7,109.5,384.7" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[35ec79840631e97e21e07811753966ba]
+@startuml
+
+[*] - -> Start
+Start : exit/ execute(1, "Exiting1")
+Start : exit/ execute(5, "Exiting2")
+
+Stop : entry/ execute(1, "Entering1")
+Stop : entry/ execute(5, "Entering2")
+
+Start -down-> Stop : event(3, "move ya")\n/execute(1, "Moving1")\nexecute(5, "Moving2")
+Stop - -> [*]
+
+@enduml
+
+PlantUML version 1.2020.02(Sun Mar 01 11:22:07 CET 2020)
+(GPL source distribution)
+Java Runtime: OpenJDK Runtime Environment
+JVM: OpenJDK 64-Bit Server VM
+Java Version: 12.0.2+9-Ubuntu-119.04
+Operating System: Linux
+Default Encoding: UTF-8
+Language: de
+Country: DE
+--></g></svg>
