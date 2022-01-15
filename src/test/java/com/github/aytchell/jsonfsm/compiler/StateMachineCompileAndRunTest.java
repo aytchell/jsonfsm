@@ -227,6 +227,42 @@ public class StateMachineCompileAndRunTest {
         assertTrue(isStillFinal);
     }
 
+    @Test
+    void behaviorsOnSelfTransitionAreExecuted() throws IOException, ValidationException, CompilationException {
+        final String json = readResourceTextFile("self_transition.json");
+        final StateMachineCompiler compiler = StateMachineParser.parse(json);
+        assertNotNull(compiler);
+        assertNotNull(compiler.getRequiredDevices());
+
+        final Set<Integer> devices = compiler.getRequiredDevices();
+        assertEquals(1, devices.size());
+        assertTrue(devices.contains(10));
+
+        StringBuffer buffer = new StringBuffer();
+        final StateMachine stateMachine = compiler.compileStateMachine(
+                Map.of(10, new LogDeviceCommandCompiler("", buffer)));
+        stateMachine.injectEvent(1, "move ya");
+        assertEquals("LeavingEntering", buffer.toString());
+    }
+
+    @Test
+    void effectsOnSelfTransitionAreExecuted() throws IOException, ValidationException, CompilationException {
+        final String json = readResourceTextFile("self_transition_effect.json");
+        final StateMachineCompiler compiler = StateMachineParser.parse(json);
+        assertNotNull(compiler);
+        assertNotNull(compiler.getRequiredDevices());
+
+        final Set<Integer> devices = compiler.getRequiredDevices();
+        assertEquals(1, devices.size());
+        assertTrue(devices.contains(10));
+
+        StringBuffer buffer = new StringBuffer();
+        final StateMachine stateMachine = compiler.compileStateMachine(
+                Map.of(10, new LogDeviceCommandCompiler("", buffer)));
+        stateMachine.injectEvent(1, "move ya");
+        assertEquals("Not moving ... ", buffer.toString());
+    }
+
     private static class LogDeviceCommand implements DeviceCommand {
         private final String prefix;
         private final StringBuffer sb;

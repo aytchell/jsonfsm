@@ -141,20 +141,50 @@ class StateMachineCompilerImpl implements StateMachineCompiler {
         for (TransitionPojo t : transitions) {
             final Boolean ignore = t.getIgnore();
             if (ignore == null || !ignore) {
-                List<BehaviorPojo> effects = t.getEffects();
-                if (effects == null || effects.isEmpty()) {
-                    state.permit(t.getTriggerName(), t.getTargetState());
-                } else {
-                    final String location =
-                            "transition (" + stateName + " -> " + t.getTargetState() +
-                                    "; trigger: " + t.getTriggerName() + ")";
-                    final DeviceCommand command = compileDeviceCommandChain(
-                            location, effects, commandCompilers);
-                    state.permit(t.getTriggerName(), t.getTargetState(), command::execute);
-                }
+                addSingleTransition(state, stateName, t, commandCompilers);
             } else {
                 state.ignore(t.getTriggerName());
             }
+        }
+    }
+
+    private void addSingleTransition(
+            StateConfiguration<String, String> state, String stateName, TransitionPojo transition,
+            Map<Integer, DeviceCommandCompiler> commandCompilers) throws CompilationException {
+        if (stateName.equals(transition.getTargetState())) {
+            addSingleSelfTransition(state, stateName, transition, commandCompilers);
+        } else {
+            addSingleChangingTransition(state, stateName, transition, commandCompilers);
+        }
+    }
+
+    private void addSingleSelfTransition(
+            StateConfiguration<String, String> state, String stateName, TransitionPojo transition,
+            Map<Integer, DeviceCommandCompiler> commandCompilers) throws CompilationException {
+        List<BehaviorPojo> effects = transition.getEffects();
+        if (effects == null || effects.isEmpty()) {
+            state.permitReentry(transition.getTriggerName());
+        } else {
+            final String location = "transition (" + stateName + " -> " + transition.getTargetState() +
+                    "; trigger: " + transition.getTriggerName() + ")";
+            final DeviceCommand command = compileDeviceCommandChain(
+                    location, effects, commandCompilers);
+            state.permitReentry(transition.getTriggerName(), command::execute);
+        }
+    }
+
+    private void addSingleChangingTransition(
+            StateConfiguration<String, String> state, String stateName, TransitionPojo transition,
+            Map<Integer, DeviceCommandCompiler> commandCompilers) throws CompilationException {
+        List<BehaviorPojo> effects = transition.getEffects();
+        if (effects == null || effects.isEmpty()) {
+            state.permit(transition.getTriggerName(), transition.getTargetState());
+        } else {
+            final String location = "transition (" + stateName + " -> " + transition.getTargetState() +
+                    "; trigger: " + transition.getTriggerName() + ")";
+            final DeviceCommand command = compileDeviceCommandChain(
+                    location, effects, commandCompilers);
+            state.permit(transition.getTriggerName(), transition.getTargetState(), command::execute);
         }
     }
 
