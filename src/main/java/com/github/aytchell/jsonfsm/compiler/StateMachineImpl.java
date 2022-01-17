@@ -45,16 +45,21 @@ class StateMachineImpl implements StateMachine {
             log.info("Ignoring unknown event '{}:{}'", eventSourceId, eventPayload);
         }
 
+        return isCurrentStateFinal();
+    }
+
+    @Override
+    public String getCurrentState() {
+        return stateMachine.getState();
+    }
+
+    @Override
+    public boolean isCurrentStateFinal() {
         if (finalStates.isEmpty()) {
             return false;
         }
 
         final String currentState = stateMachine.getState();
         return finalStates.contains(currentState);
-    }
-
-    @Override
-    public String getCurrentState() {
-        return stateMachine.getState();
     }
 }

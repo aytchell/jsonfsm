@@ -178,6 +178,33 @@ public class StateMachineCompileAndRunTest {
     }
 
     @Test
+    void isCurrentStateFinalWorksCorrect() throws IOException, ValidationException, CompilationException {
+        final String json = readResourceTextFile("final_states.json");
+        final StateMachineCompiler compiler = StateMachineParser.parse(json);
+        assertNotNull(compiler);
+        assertNotNull(compiler.getRequiredDevices());
+
+        final Set<Integer> devices = compiler.getRequiredDevices();
+        assertTrue(devices.isEmpty());
+
+        final StateMachine stateMachine = compiler.compileStateMachine(Map.of());
+        assertTrue(stateMachine.isCurrentStateFinal());
+
+        // transition "One" --> "Two"
+        stateMachine.injectEvent(1, "move ya");
+        assertFalse(stateMachine.isCurrentStateFinal());
+        // transition "Two" --> "Three"
+        stateMachine.injectEvent(1, "move ya");
+        assertTrue(stateMachine.isCurrentStateFinal());
+        // transition "Three" --> "One"
+        stateMachine.injectEvent(1, "move ya");
+        assertTrue(stateMachine.isCurrentStateFinal());
+        // transition "One" --> "Two"
+        stateMachine.injectEvent(1, "move ya");
+        assertFalse(stateMachine.isCurrentStateFinal());
+    }
+
+    @Test
     void currentStateIsCorrect() throws IOException, ValidationException, CompilationException {
         final String json = readResourceTextFile("final_states.json");
         final StateMachineCompiler compiler = StateMachineParser.parse(json);

@@ -58,4 +58,10 @@ public interface StateMachine {
      * @return Name of the current state
      */
     String getCurrentState();
+
+    /**
+     * Says whether the current state is a final state or not
+     * @return {@code true} if the current state is final; {@code false} otherwise
+     */
+    boolean isCurrentStateFinal();
 }
