@@ -21,7 +21,7 @@ import java.util.stream.Stream;
 public class StateMachineParserImpl {
     private final ObjectMapper mapper = new ObjectMapper();
 
-    public StateMachineCompiler parseAndListRequiredDeviceIds(String jsonDescription) throws ValidationException {
+    public StateMachineCompiler parse(String jsonDescription) throws ValidationException {
         Validator.expect(jsonDescription, "jsonStateMachine").notNull().notBlank();
 
         final StateMachinePojo stateMachinePojo = parseJsonToPojo(jsonDescription);
