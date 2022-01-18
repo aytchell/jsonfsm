@@ -64,21 +64,19 @@ public class StateMachineParserImpl {
     }
 
     private Set<Integer> extractRequiredEntryDeviceIds(StatePojo state) {
-        List<BehaviorPojo> entries = state.getOnEntry();
-        if (entries == null || entries.isEmpty()) {
-            return Set.of();
-        }
-
-        return entries.stream().map(BehaviorPojo::getDeviceId).collect(Collectors.toSet());
+        return extractRequiredBehaviorDeviceIds(state.getOnEntry());
     }
 
     private Set<Integer> extractRequiredExitDeviceIds(StatePojo state) {
-        List<BehaviorPojo> exits = state.getOnExit();
-        if (exits == null || exits.isEmpty()) {
+        return extractRequiredBehaviorDeviceIds(state.getOnExit());
+    }
+
+    private Set<Integer> extractRequiredBehaviorDeviceIds(List<BehaviorPojo> behaviors) {
+        if (behaviors == null || behaviors.isEmpty()) {
             return Set.of();
         }
 
-        return exits.stream().map(BehaviorPojo::getDeviceId).collect(Collectors.toSet());
+        return behaviors.stream().map(BehaviorPojo::getDeviceId).collect(Collectors.toSet());
     }
 
     private Collection<Integer> extractRequiredTransitionDeviceIds(StatePojo state) {
