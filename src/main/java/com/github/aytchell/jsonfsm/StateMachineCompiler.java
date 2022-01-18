@@ -4,11 +4,11 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Intermediate step when compiling a state machine from json
+ * Intermediate step when compiling a state machine from json.
  */
 public interface StateMachineCompiler {
     /**
-     * Returns a set of device IDs for which {@link DeviceCommandCompiler}s are required
+     * Returns a set of device IDs for which {@link DeviceCommandCompiler}s are required.
      *
      * After parsing a given json the library can tell a caller which device IDs are used by the
      * state machine. Actual compilation of the device commands is done in the next step.
@@ -22,7 +22,7 @@ public interface StateMachineCompiler {
     Set<Integer> getRequiredDevices();
 
     /**
-     * Returns a set of event source IDs which are mentioned in the json encoded state machine
+     * Returns a set of event source IDs which are mentioned in the json encoded state machine.
      *
      * The set of IDs returned by this method is purely as an information for the caller.
      * Events from these event source IDs will later be accepted by {@link StateMachine#injectEvent}.
@@ -32,7 +32,7 @@ public interface StateMachineCompiler {
     Set<Integer> getAcceptedEventSources();
 
     /**
-     * Used to actually create the {@link StateMachine} instance
+     * Used to actually create the {@link StateMachine} instance.
      *
      * After parsing and validating the json-encoded state machine this method will create
      * the actual instance. For this it requires a set of {@link DeviceCommandCompiler}s.

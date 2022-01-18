@@ -3,7 +3,7 @@ package com.github.aytchell.jsonfsm;
 import java.util.Set;
 
 /**
- * A state machine closely related to DFA and UML state chart diagrams
+ * A state machine closely related to DFA and UML state chart diagrams.
  *
  * The state machine will accept (a given set of) events and change it's
  * internal state accordingly. It can return if one of several final states
@@ -14,7 +14,7 @@ import java.util.Set;
  */
 public interface StateMachine {
     /**
-     * Injects an event into the state machine
+     * Injects an event into the state machine.
      *
      * If the event is accepted by the state machine (i.e. valid for the current state
      * according to the json-encoded state machine) the state machine will execute
@@ -32,7 +32,7 @@ public interface StateMachine {
     boolean injectEvent(int eventSourceId, String eventPayload);
 
     /**
-     * Set of device IDs which will be used by this state machine
+     * Set of device IDs which will be used by this state machine.
      *
      * This is basically the same information as returned by
      * {@link StateMachineCompiler#getRequiredDevices}.
@@ -42,7 +42,7 @@ public interface StateMachine {
     Set<Integer> getControlledDeviceIds();
 
     /**
-     * Set of IDs of event sources which are accepted by this instance
+     * Set of IDs of event sources which are accepted by this instance.
      *
      * This is basically the same information as returned by
      * {@link StateMachineCompiler#getAcceptedEventSources}. Note that for each event
@@ -54,13 +54,15 @@ public interface StateMachine {
     Set<Integer> getHandledEventSourceIds();
 
     /**
-     * Returns the name of the current state the machine is in
+     * Returns the name of the current state the machine is in.
+     *
      * @return Name of the current state
      */
     String getCurrentState();
 
     /**
-     * Says whether the current state is a final state or not
+     * Says whether the current state is a final state or not.
+     *
      * @return {@code true} if the current state is final; {@code false} otherwise
      */
     boolean isCurrentStateFinal();

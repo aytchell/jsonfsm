@@ -1,14 +1,14 @@
 package com.github.aytchell.jsonfsm;
 
 /**
- * Interface for compiling a command string to a closure
+ * Interface for compiling a command string to a closure.
  *
  * Instances of this interface are required by the {@link StateMachineCompiler}
  * and have to be provided by the user of the library.
  */
 public interface DeviceCommandCompiler {
     /**
-     * Compile a given command string to a closure acting on a specific device
+     * Compile a given command string to a closure acting on a specific device.
      *
      * What exactly implementations of this interface do is completely up to the
      * user of the library. It can be an actual hardware device as well as a logger,

@@ -4,7 +4,7 @@ import com.github.aytchell.jsonfsm.compiler.StateMachineParserImpl;
 import com.github.aytchell.validator.exceptions.ValidationException;
 
 /**
- * Parser for reading json encoded state machines
+ * Parser for reading json encoded state machines.
  *
  * This class carries the main entry point for the library. It will parse and validate
  * a given json-encoded string and return a StateMachineCompiler which then can be
