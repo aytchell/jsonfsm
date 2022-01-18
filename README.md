@@ -26,7 +26,7 @@ The describable state machines consist of
 * a transition can have one or more `effects` behaviors attached which are
     executed when traversing the transition
 * Given input is heavily checked and validated. Exceptions contain "useful"
-  error messages (so the author of the json will know, what to fix)
+  error messages (so the author of the json will know what to fix)
 * User provided code (the "behaviors") is wrapped at runtime. Thrown
   exceptions will be logged and don't affect the state machine or other
   behaviors.
@@ -131,7 +131,7 @@ it will throw a `ValidationException` which will contain detailed information
 what's wrong.
 
 Parsing the json will give you a `StateMachineCompiler`. This compiler knows
-which `eventSourceId`s send required events and it knows, the `deviceId`s
+which `eventSourceId`s might send events, and it knows, the `deviceId`s
 of the devices where `commandString`s will be executed.
 
 ```java
