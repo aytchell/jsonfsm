@@ -5,7 +5,7 @@ import com.github.aytchell.validator.exceptions.ValidationException;
 
 /**
  * Parser for reading json encoded state machines.
- *
+ * <p>
  * This class carries the main entry point for the library. It will parse and validate
  * a given json-encoded string and return a StateMachineCompiler which then can be
  * used to create the StateMachine instance.

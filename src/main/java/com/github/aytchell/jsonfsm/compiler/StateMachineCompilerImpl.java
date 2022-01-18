@@ -1,10 +1,6 @@
 package com.github.aytchell.jsonfsm.compiler;
 
-import com.github.aytchell.jsonfsm.DeviceCommand;
-import com.github.aytchell.jsonfsm.DeviceCommandCompiler;
-import com.github.aytchell.jsonfsm.StateMachine;
-import com.github.aytchell.jsonfsm.StateMachineCompiler;
-import com.github.aytchell.jsonfsm.CompilationException;
+import com.github.aytchell.jsonfsm.*;
 import com.github.aytchell.jsonfsm.input.pojos.BehaviorPojo;
 import com.github.aytchell.jsonfsm.input.pojos.StateMachinePojo;
 import com.github.aytchell.jsonfsm.input.pojos.StatePojo;
@@ -27,7 +23,7 @@ class StateMachineCompilerImpl implements StateMachineCompiler {
     private final StateMachineConfig<String, String> config;
 
     StateMachineCompilerImpl(Set<Integer> requiredDevices, Set<Integer> acceptedEventSources,
-            StateMachinePojo stateMachinePojo) {
+                             StateMachinePojo stateMachinePojo) {
         this.requiredDevices = requiredDevices;
         this.acceptedEventSources = acceptedEventSources;
         mapping = new EventTranslator();
@@ -190,7 +186,7 @@ class StateMachineCompilerImpl implements StateMachineCompiler {
 
     private DeviceCommand compileDeviceCommandChain(
             String location, List<BehaviorPojo> effects,
-            Map<Integer,DeviceCommandCompiler> commandCompilers) throws CompilationException {
+            Map<Integer, DeviceCommandCompiler> commandCompilers) throws CompilationException {
         final List<DeviceCommand> commands = new LinkedList<>();
         for (BehaviorPojo e : effects) {
             try {

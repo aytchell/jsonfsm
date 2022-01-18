@@ -159,14 +159,14 @@ class StateMachinePojoValidator {
         Validator.expect(transition.getTriggerName(), "triggerName").notNull().notBlank()
                 .passes(knownTriggerNames::contains, "is a known triggerName");
         Validator.expect(transition.getTargetState(), "targetState",
-                "alternatively add 'transition.ignore = true'").ifNotGivenOrFalse(transition.getIgnore())
+                        "alternatively add 'transition.ignore = true'").ifNotGivenOrFalse(transition.getIgnore())
                 // if 'ignore' is given and 'true' we skip the test. Otherwise, continue with the check
                 .notNull();
         Validator.expect(transition.getTargetState(), "targetState").ifNotGivenOrFalse(transition.getIgnore())
                 // no extraInfo if the name is malformed
                 .notNull().notBlank().passes(knownStateNames::contains, "is contained in states");
         Validator.expect(transition.getEffects(), "effects").ifNotGivenOrFalse(transition.getIgnore())
-                        .ifNotNull().eachCustomEntry(this::expectBehaviorIsComplete);
+                .ifNotNull().eachCustomEntry(this::expectBehaviorIsComplete);
         Validator.expect(transition.getIgnore(), "ignore")
                 .ifTrue(transition.getTargetState() == null)
                 // no 'targetState' given so there has to be 'ignore' and it must be 'true'
