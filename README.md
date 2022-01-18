@@ -1,17 +1,17 @@
 # A "json to statemachine" library
 
 This library can take a json-encoded state machine and create a runnable state
-machine from it. The supported state machine features and names are modeled
+machine from it. The supported features and the used terminology are modeled
 along the UML state chart diagram (which itself is based on finite automatas).
 
 It allows not only to track a state but also to execute custom commands while
-the states are traversed.
+the transitions are traversed.
 
 ## Features
 
 The describable state machines consist of
 
-* a set of `states`
+* a set of `states` identified by names
 * one of them being the `initialState`
 * a set of `finalStates` ("accepting states"); the state machine will report
     if one of them is reached; processing can nevertheless continue
@@ -25,7 +25,7 @@ The describable state machines consist of
     executed when leaving the state
 * a transition can have one or more `effects` behaviors attached which are
     executed when traversing the transition
-* Given input is heavily checked and validated. Exceptions contain "useful"
+* the given input is heavily checked and validated. Exceptions contain "useful"
   error messages (so the author of the json will know what to fix)
 * User provided code (the "behaviors") is wrapped at runtime. Thrown
   exceptions will be logged and don't affect the state machine or other
@@ -34,24 +34,26 @@ The describable state machines consist of
 ## Example
 
 The following state chart diagram has two states which are "connected" by
-one transmission. If this transmission is traversed there are several
-behaviors executed.
+one transmission. The state 'Start' is the initial state; the state machine will start
+"from within" this state. 'Stop' is a final state.
+If the transmission is traversed there are several behaviors executed.
 
-The way this lib allows a user to define commands is described as
-"execute this command string on device with id 5". What exactly "device 5"
+The way this lib allows a user to define commands can be described as
+"execute this command string on the device with id 5". What exactly "device 5"
 is and how it handles a given command string is completely up to the
 user's code.
 
 ![A small state chart with states 'Start' and 'Stop' and several behaviors involved](doc/example.svg)
 
-This state charts is shown as json in the following block.
+The json-encoding for this state chart is shown in the following block.
 
 Triggers are identified in the json via an `eventSourceId` and an
 `eventPayload`.
 
-Behaviors are described in a way so that the json part only
-contains an identifier and the user of this lib has to provide the
-implementation (identified by a `deviceId` and a `commandString`).
+Behaviors are described in a way so that the json part only contains a string
+representation of the command (`commandString`) and the ID of the device to execute it
+(`deviceId`). The user of this lib has to provide the
+java implementation.
 
 ```json
 {
@@ -109,7 +111,7 @@ implementation (identified by a `deviceId` and a `commandString`).
 ```xml
     <dependency>
         <groupId>com.github.aytchell</groupId>
-        <artifactId>json-statemachine</artifactId>
+        <artifactId>jsonfsm</artifactId>
         <version>2.0.0</version>
     </dependency>
 ```
@@ -140,9 +142,10 @@ Set<Integer> eventSourceIds = compiler.getAcceptedEventSources();
 Set<Integer> deviceIds = compiler.getRequiredDevices();
 ```
 
-The `eventSourceIds` will be important during execution of the state machine.
+The `eventSourceIds` will be important later during execution of the state machine.
 The `deviceIds` are important to actually "compile" the state machine. For
-each given `deviceId` the caller has to provide an implementation of
+each given `deviceId` the caller has to provide an implementation of the interface
+`DeviceCommandCompiler`.
 
 ```java
 public interface DeviceCommandCompiler {
@@ -151,7 +154,7 @@ public interface DeviceCommandCompiler {
 ```
 
 for a given `commandString` this `DeviceCommandCompiler` must be able to
-create an implementation of
+create an implementation of the interface `DeviceCommand`.
 
 ```java
 public interface DeviceCommand {
@@ -170,13 +173,13 @@ final StateMachine machine = compiler.compileStateMachine(commandCompilers);
 ```
 
 During compilation a `CompilationException` might be thrown (e.g. if compiling
-a command throw or if a command compiler is missing). This exception will
+a command throws or if a command compiler is missing). This exception will
 contain information to figure out, what's wrong.
 
 If compilation succeeds you'll have a `StateMachine` where you basically only
-have to inject events and the machine takes care of the rest. Only command
-from the `eventSourceIds` returned by the parser will trigger an action.
-All others will be ignored.
+have to inject events and the machine takes care of the rest. Only events originating
+from those `eventSourceIds` indicated by the parser will trigger an action.
+All others will be ignored (a log message will be emitted).
 
 ```java
 boolean isFinal = machine.injectEvent(3, "move ya");
@@ -221,7 +224,7 @@ which must contain at least one entry. Each description of a trigger has this fo
 }
 ```
 
-A trigger describes an event coming from a device (identified via an ID)
+A trigger describes an event coming from a specific source (identified via an ID)
 and having a known payload. Every time the user's code calls
 `injectEvent(int eventSourceId, String eventPayload)` the state machine
 tries to find a matching trigger. If one is found, and the current state
@@ -233,10 +236,12 @@ with the same name.
 
 The `eventSourceId` (an integer value) defines from which input source
 this event is expected to arrive. The `eventPayload` (a string) describes
-the exact event coming from that source.
+the exact event coming from that source. It is not allowed to have two triggers with
+identical content (`eventSourceId` plus `eventPayload`).
 
 Of course `eventPayload` might be a self-chosen description in case your
-event is not a string.
+event is not a string. In this case your event source needs to have a "translation layer"
+which emits events with string payloads.
 
 ### states
 
@@ -258,7 +263,7 @@ Each state must have a unique name.
 #### entry/exit behaviors
 
 The entries `onEntry` and `onExit` are optional. If present, they contain
-the behaviors to be executed when the state is entered (via transition).
+arrays of behaviors to be executed when the state is entered or left (via transition).
 This happens even if the target state of a transition is the state itself
 ("self-transition").
 
@@ -271,10 +276,16 @@ A behavior is defined like this
 }
 ```
 
+where `deviceId` identifies "the device" where a command is executed and `commandString`
+describes the actual command. Note that it is called "device" even though it doesn't need
+to be a piece of hardware. A "device", as used by this library, might also be a REST-call,
+a logger, a connection to an MQTT broker, a command line, ... whatever you have an adapter
+for.
+
 #### transitions
 
 The `transitions` entry is optional (so you might have states with no way out).
-If present, it contains an array of transition description
+If present, it contains an array of transition descriptions.
 
 ```json
 {
@@ -291,10 +302,11 @@ if they equal the transition will be traversed.
 The entry `ignore` says, whether events matching this trigger should be ignored.
 If `ignore` is not given its value is treated as `false`. If this entry
 is given and its value is `true` then the entries `targetState` and `effects`
-are ignored, too (so they are optional). This flag is mostly useful for expressing
+are ignored, too (so they become optional). This flag is mostly useful for expressing
 intent: as a documentation for others as well as for the state machine during execution.
 If an event arrives in a state with no matching trigger the lib will log
-a warning message.
+a warning message. Ignored transitions can be seen as (internal) self-transitions without
+effects and disabled entry/exit behaviors.
 
 The `targetState` entry is mandatory (except if `ignore` is `true`). It contains the
 name of the state where the machine ends up if the transition is traversed.
@@ -313,7 +325,8 @@ If during execution the state machine reaches one of these states, the method
 `StateMachine.injectEvent()` will return `true`. For non-final states it will
 return `false`.
 
-(The name of the current state can be queried via `StateMachine.getCurrentState()`.)
+(The name of the current state can be queried via `StateMachine.getCurrentState()`. There's
+also a method `StateMachine.isCurrentStateFinal()`.)
 
 ## License
 
