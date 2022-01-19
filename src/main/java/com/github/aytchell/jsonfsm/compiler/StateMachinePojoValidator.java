@@ -71,53 +71,31 @@ class StateMachinePojoValidator {
                     Validator.expect(state.getName(), "name").notNull().notBlank();
                     expectBehaviorListIsCompleteIfGiven(state.getOnEntry(), "onEntry");
                     expectBehaviorListIsCompleteIfGiven(state.getOnExit(), "onExit");
-                    onlyOneSuchStateName(state, allStates);
 
                     // For validating the transitions we need to have a list of all known state names
                     knownStateNames.add(state.getName());
-                });
+                })
+                .allEntriesAreUnique(StateMachinePojoValidator::stateNamesAreEqual,
+                        "name", StatePojo::getName);
 
         // the validation step above compiles a list of known states. When validating the transitions we need to have
         // a complete list of known states that's why we need a separate loop over all the states
         Validator.expect(allStates, "states").notNull().notEmpty().eachCustomEntry(
                 state -> {
-                    final List<TransitionPojo> allTransitions = state.getTransitions();
-                    Validator.expect(allTransitions, "transitions").ifNotNull()
-                            .eachCustomEntry(
-                                    transition -> validateTransition(transition, allTransitions));
+                    Validator.expect(state.getTransitions(), "transitions")
+                            .ifNotNull()
+                            .eachCustomEntry(this::validateTransition)
+                            .allEntriesAreUnique(StateMachinePojoValidator::transitionTriggerNamesAreEqual,
+                                    "triggerName", TransitionPojo::getTriggerName);
                 });
     }
 
-    private void onlyOneSuchStateName(StatePojo state, List<StatePojo> allStates) throws ValidationException {
-        int counter = 0;
-        for (StatePojo check : allStates) {
-            if (state.getName().equals(check.getName())) {
-                ++counter;
-            }
-        }
-        if (counter > 1) {
-            throw new ValidationException()
-                    .setActualValuesName("name")
-                    .setActualValue(state.getName())
-                    .setExpectation("is unique throughout all states");
-        }
+    private static boolean stateNamesAreEqual(StatePojo lhs, StatePojo rhs) {
+        return lhs.getName().equals(rhs.getName());
     }
 
-    private void onlyOneSuchTransitionName(TransitionPojo transition, List<TransitionPojo> allTransitions)
-            throws ValidationException {
-        int counter = 0;
-        for (TransitionPojo check : allTransitions) {
-            if (transition.getTriggerName().equals(check.getTriggerName())) {
-                ++counter;
-            }
-        }
-        if (counter > 1) {
-            throw new ValidationException()
-                    .setActualValuesName("triggerName")
-                    .setActualValue(transition.getTriggerName())
-                    .setExpectation("is unique withing this state");
-
-        }
+    private static boolean transitionTriggerNamesAreEqual(TransitionPojo lhs, TransitionPojo rhs) {
+        return lhs.getTriggerName().equals(rhs.getTriggerName());
     }
 
     private void validateInitialState() throws ValidationException {
@@ -135,8 +113,7 @@ class StateMachinePojoValidator {
                 );
     }
 
-    private void validateTransition(TransitionPojo transition, List<TransitionPojo> allTransitions)
-            throws ValidationException {
+    private void validateTransition(TransitionPojo transition) throws ValidationException {
         Validator.expect(transition.getTriggerName(), "triggerName").notNull().notBlank()
                 .passes(knownTriggerNames::contains, "is a known triggerName");
         Validator.expect(transition.getTargetState(), "targetState",
@@ -152,7 +129,6 @@ class StateMachinePojoValidator {
                 .ifTrue(transition.getTargetState() == null)
                 // no 'targetState' given so there has to be 'ignore' and it must be 'true'
                 .notNull().isTrue();
-        onlyOneSuchTransitionName(transition, allTransitions);
     }
 
     private void expectBehaviorListIsCompleteIfGiven(List<BehaviorPojo> behaviors, String name)
