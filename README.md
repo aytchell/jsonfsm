@@ -31,6 +31,16 @@ The describable state machines consist of
   exceptions will be logged and don't affect the state machine or other
   behaviors.
 
+## Maven
+
+```xml
+    <dependency>
+        <groupId>com.github.aytchell</groupId>
+        <artifactId>jsonfsm</artifactId>
+        <version>2.0.0</version>
+    </dependency>
+```
+
 ## Example
 
 The following state chart diagram has two states which are "connected" by
@@ -104,16 +114,6 @@ java implementation.
     } ],
   "finalStates" : [ "Stop" ]
 }
-```
-
-## Maven
-
-```xml
-    <dependency>
-        <groupId>com.github.aytchell</groupId>
-        <artifactId>jsonfsm</artifactId>
-        <version>2.0.0</version>
-    </dependency>
 ```
 
 ## Basic usage
