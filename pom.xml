@@ -6,7 +6,7 @@
 
     <groupId>com.github.aytchell</groupId>
     <artifactId>jsonfsm</artifactId>
-    <version>2.0.0</version>
+    <version>2.0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>json-fsm</name>
@@ -63,7 +63,7 @@
         <surefire-plugin.version>2.22.2</surefire-plugin.version>
 
         <stateless4j.version>2.6.0</stateless4j.version>
-        <validator.version>2.2.1</validator.version>
+        <validator.version>2.2.2-SNAPSHOT</validator.version>
         <lombok.version>1.18.22</lombok.version>
         <slf4j.version>1.7.32</slf4j.version>
         <jackson.version>2.13.1</jackson.version>

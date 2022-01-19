@@ -42,45 +42,26 @@ class StateMachinePojoValidator {
                             Validator.expect(trigger.getName(), "name").notNull().notBlank();
                             Validator.expect(trigger.getEventSourceId(), "eventSourceId").notNull().greaterThan(0);
                             Validator.expect(trigger.getEventPayload(), "eventPayload").notNull().notBlank();
-                            onlyOneSuchTriggerName(trigger, allTriggers);
-                            onlyOneSuchTriggerContent(trigger, allTriggers);
                             knownTriggerNames.add(trigger.getName());
                         }
-                );
+                )
+                // trigger names shall be unique
+                .allEntriesAreUnique(
+                        StateMachinePojoValidator::triggerNamesAreEqual, "name", TriggerPojo::getName)
+                // trigger contents shall be unique
+                .allEntriesAreUnique(
+                        StateMachinePojoValidator::triggerContentsAreEqual,
+                        "(eventSourceId/eventPayload)",
+                        t-> "(" + t.getEventSourceId() + "/" + t.getEventPayload() + ")");
     }
 
-    private void onlyOneSuchTriggerName(TriggerPojo trigger, List<TriggerPojo> allTriggers)
-            throws ValidationException {
-        int counter = 0;
-        for (TriggerPojo check : allTriggers) {
-            if (trigger.getName().equals(check.getName())) {
-                ++counter;
-            }
-        }
-        if (counter > 1) {
-            throw new ValidationException()
-                    .setActualValuesName("name")
-                    .setActualValue(trigger.getName())
-                    .setExpectation("is unique throughout all triggers");
-        }
+    private static boolean triggerNamesAreEqual(TriggerPojo lhs, TriggerPojo rhs) {
+        return lhs.getName().equals(rhs.getName());
     }
 
-    private void onlyOneSuchTriggerContent(TriggerPojo trigger, List<TriggerPojo> allTriggers)
-            throws ValidationException {
-        int counter = 0;
-        for (TriggerPojo check : allTriggers) {
-            final boolean sameSourceId = trigger.getEventSourceId().equals(check.getEventSourceId());
-            final boolean samePayload = trigger.getEventPayload().equals(check.getEventPayload());
-            if (sameSourceId && samePayload) {
-                ++counter;
-            }
-        }
-        if (counter > 1) {
-            throw new ValidationException()
-                    .setActualValuesName("name")
-                    .setActualValue(trigger.getName())
-                    .setExpectation("has unique entries throughout triggers");
-        }
+    private static boolean triggerContentsAreEqual(TriggerPojo lhs, TriggerPojo rhs) {
+        return lhs.getEventSourceId().equals(rhs.getEventSourceId()) &&
+                lhs.getEventPayload().equals(rhs.getEventPayload());
     }
 
     private void validateStates() throws ValidationException {
